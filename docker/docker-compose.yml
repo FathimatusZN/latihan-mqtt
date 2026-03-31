@@ -12,6 +12,26 @@ version: "3.9"
 
 services:
 
+  # ── 0. MOSQUITTO MQTT BROKER ─────────────────────────────
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker
+    restart: unless-stopped
+    ports:
+      - "1883:1883"   # TCP — untuk MQTTX desktop / paho-mqtt
+      - "9001:9001"   # WebSocket — untuk browser / MQTTX Web
+    volumes:
+      - ../docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - mqtt-net
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t '$$SYS/test' -m '' -q 0 2>/dev/null || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # ── 1. POSTGRESQL DATABASE ──────────────────────────────
   postgres:
     image: postgres:16-alpine
@@ -46,6 +66,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy   # Tunggu postgres siap sebelum backend start
+      mosquitto:
+        condition: service_healthy
     environment:
       # Override .env dengan environment variables Docker
       DB_HOST:        postgres          # Nama service → otomatis resolve oleh Docker network
@@ -53,7 +75,7 @@ services:
       DB_NAME:        monitoring_pabrik
       DB_USER:        postgres
       DB_PASSWORD:    password_docker
-      MQTT_BROKER:    broker.hivemq.com
+      MQTT_BROKER:    mosquitto
       MQTT_PORT:      "1883"
       MQTT_TOPIC:     pabrik/efortech/mesin/arus
       MQTT_CLIENT_ID: efortech-docker-001
@@ -89,3 +111,5 @@ networks:
 volumes:
   postgres_data:
     driver: local
+  mosquitto_data:
+  mosquitto_log:
