@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitoring Arus Mesin — Efortech</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+            <span class="nav-brand">Monitoring Arus Mesin</span>
+            <span class="nav-sub">Efortech Industrial</span>
+        </div>
+        <div class="nav-right">
+            <div class="live-pill" id="livePill">
+                <span class="live-dot" id="liveDot"></span>
+                <span id="liveLabel">Connecting…</span>
+            </div>
+            <span class="nav-clock" id="navClock">--:--:--</span>
+            <button class="btn-icon" onclick="fetchAll()" title="Refresh">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                </svg>
+            </button>
+            <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Toggle tema">
+                <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="4" />
+                    <path
+                        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+                <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="display:none">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="alert-banner" id="alertBanner" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <span id="alertText">—</span>
+    </div>
+
+    <div class="kpi-strip">
+        <div class="kpi-card">
+            <span class="kpi-label">Total log hari ini</span>
+            <span class="kpi-val" id="kTotal">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Mesin aktif</span>
+            <span class="kpi-val kpi-ok" id="kAktif">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Warning (24j)</span>
+            <span class="kpi-val kpi-warn" id="kWarn">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Critical (24j)</span>
+            <span class="kpi-val kpi-crit" id="kCrit">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Rata-rata arus</span>
+            <span class="kpi-val" id="kAvg">—</span>
+        </div>
+    </div>
+
+    <main class="main-layout">
+
+        <div class="col-left">
+            <div class="card">
+                <div class="card-head">
+                    <span class="card-title">Pembacaan terkini</span>
+                    <span class="card-hint" id="lastUpdate">—</span>
+                </div>
+                <div class="gauge-grid" id="gaugeGrid">
+                    <div class="empty-state">Menunggu data MQTT…</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <span class="card-title">Statistik per mesin (24 jam)</span>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mesin</th>
+                                <th>Rata-rata</th>
+                                <th>Puncak</th>
+                                <th>Warning</th>
+                                <th>Critical</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statBody">
+                            <tr>
+                                <td colspan="5" class="empty-cell">Memuat…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-right">
+            <div class="card card-full">
+                <div class="card-head">
+                    <span class="card-title">Log terbaru</span>
+                    <div class="filter-group">
+                        <select id="filterMesin" onchange="fetchLogs()">
+                            <option value="">Semua mesin</option>
+                        </select>
+                        <select id="filterStatus" onchange="fetchLogs()">
+                            <option value="">Semua status</option>
+                            <option value="NORMAL">Normal</option>
+                            <option value="WARNING">Warning</option>
+                            <option value="CRITICAL">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-scroll table-scroll-tall">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Mesin</th>
+                                <th>Arus</th>
+                                <th>Status</th>
+                                <th>Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logBody">
+                            <tr>
+                                <td colspan="5" class="empty-cell">Memuat log…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <span>Efortech Industrial Monitoring v1.0</span>
+        <span id="footerUpdate">—</span>
+        <span>API: <code id="footerApi">localhost:8000</code></span>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

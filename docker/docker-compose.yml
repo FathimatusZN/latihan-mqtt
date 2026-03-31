@@ -1,0 +1,91 @@
+# ============================================================
+#  FILE    : docker/docker-compose.yml
+#  FUNGSI  : Orkestrasi semua service dalam satu perintah
+#  CARA    : sudo docker-compose up -d
+#  SERVICE :
+#    1. postgres   → Database PostgreSQL
+#    2. backend    → Python FastAPI + MQTT subscriber
+#    3. frontend   → Nginx serve static files
+# ============================================================
+
+version: "3.9"
+
+services:
+
+  # ── 1. POSTGRESQL DATABASE ──────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: mqtt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       monitoring_pabrik
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: password_docker   # GANTI di production!
+    volumes:
+      # Mount script SQL agar otomatis dijalankan saat container pertama kali dibuat
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # Persistent volume agar data tidak hilang saat container restart
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"   # Host:5433 → Container:5432 (hindari konflik dengan postgres lokal)
+    networks:
+      - mqtt-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d monitoring_pabrik"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── 2. PYTHON BACKEND (FastAPI + MQTT Subscriber) ───────
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: mqtt-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy   # Tunggu postgres siap sebelum backend start
+    environment:
+      # Override .env dengan environment variables Docker
+      DB_HOST:        postgres          # Nama service → otomatis resolve oleh Docker network
+      DB_PORT:        "5432"
+      DB_NAME:        monitoring_pabrik
+      DB_USER:        postgres
+      DB_PASSWORD:    password_docker
+      MQTT_BROKER:    broker.hivemq.com
+      MQTT_PORT:      "1883"
+      MQTT_TOPIC:     pabrik/efortech/mesin/arus
+      MQTT_CLIENT_ID: efortech-docker-001
+      API_HOST:       0.0.0.0
+      API_PORT:       "8000"
+    ports:
+      - "8000:8000"   # Expose API ke host
+    networks:
+      - mqtt-net
+    volumes:
+      - ../backend:/app   # Hot-reload saat development (opsional)
+
+  # ── 3. NGINX FRONTEND ────────────────────────────────────
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: mqtt-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"     # Dashboard: http://localhost:8080
+    networks:
+      - mqtt-net
+
+# ── NETWORKS ─────────────────────────────────────────────
+networks:
+  mqtt-net:
+    driver: bridge
+
+# ── VOLUMES ──────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,106 @@
+{
+  "_panduan": "============================================================",
+  "_panduan1": " FILE    : mqtt/sample_payload.json",
+  "_panduan2": " FUNGSI  : Contoh format JSON untuk dikirim via MQTTX",
+  "_panduan3": "============================================================",
+
+  "_tutorial_mqttx": {
+    "langkah_1_install": "Download MQTTX dari https://mqttx.app/ (gratis, multi-platform)",
+    "langkah_2_new_connection": {
+      "nama": "Klik tombol '+' atau 'New Connection'",
+      "field_Name": "Efortech MQTT Monitor",
+      "field_Host": "broker.hivemq.com",
+      "field_Port": "1883",
+      "field_Client_ID": "mqttx-simulator-001 (bisa auto-generate)",
+      "field_Username": "(kosongkan — broker publik tidak perlu auth)",
+      "field_Password": "(kosongkan)",
+      "klik": "Connect"
+    },
+    "langkah_3_publish": {
+      "topic": "pabrik/efortech/mesin/arus",
+      "qos": "1",
+      "retain": "false",
+      "payload_type": "JSON",
+      "catatan": "Salin salah satu contoh payload di bawah ke kolom payload, lalu klik Send/Publish"
+    },
+    "langkah_4_verifikasi": "Lihat terminal Python — seharusnya muncul log '💾 Data tersimpan'"
+  },
+
+  "_contoh_payload": "Salin salah satu JSON di bawah ini ke MQTTX:",
+
+  "contoh_1_normal": {
+    "nama_mesin": "Mesin_CNC_01",
+    "nilai_arus": 8.5,
+    "batas_arus_max": 25.0,
+    "lokasi": "Lantai 1 - Zona A",
+    "keterangan": "Operasi normal shift pagi"
+  },
+
+  "contoh_2_warning": {
+    "nama_mesin": "Kompresor_01",
+    "nilai_arus": 22.3,
+    "batas_arus_max": 30.0,
+    "lokasi": "Ruang Utilitas",
+    "keterangan": "Arus mendekati batas, cek filter udara"
+  },
+
+  "contoh_3_critical": {
+    "nama_mesin": "Conveyor_A",
+    "nilai_arus": 18.9,
+    "batas_arus_max": 15.0,
+    "lokasi": "Lantai 1 - Zona B",
+    "keterangan": "OVERLOAD! Hentikan mesin segera!"
+  },
+
+  "contoh_4_minimal": {
+    "nama_mesin": "Pompa_Hidrolik_01",
+    "nilai_arus": 11.2
+  },
+
+  "contoh_5_dengan_timestamp": {
+    "nama_mesin": "Mesin_CNC_02",
+    "nilai_arus": 14.7,
+    "batas_arus_max": 25.0,
+    "lokasi": "Lantai 1 - Zona A",
+    "waktu_sensor": "2025-01-15T08:30:00+07:00",
+    "keterangan": "Data dengan timestamp dari sensor"
+  },
+
+  "_field_penjelasan": {
+    "nama_mesin": "[WAJIB] Nama/ID mesin. Harus sama dengan yang di tabel daftar_mesin",
+    "nilai_arus": "[WAJIB] Nilai arus dalam Ampere (angka desimal)",
+    "batas_arus_max": "[OPSIONAL] Default 20.0 Ampere jika tidak dikirim",
+    "lokasi": "[OPSIONAL] Lokasi fisik mesin di pabrik",
+    "keterangan": "[OPSIONAL] Catatan tambahan dari operator/sensor",
+    "waktu_sensor": "[OPSIONAL] Timestamp ISO 8601 dari sensor/perangkat IoT"
+  },
+
+  "_broker_alternatif": {
+    "hivemq": {
+      "host": "broker.hivemq.com",
+      "port_tcp": 1883,
+      "port_websocket": 8000,
+      "auth": "tidak perlu",
+      "cocok_untuk": "testing & development"
+    },
+    "mosquitto_test": {
+      "host": "test.mosquitto.org",
+      "port_tcp": 1883,
+      "port_tls": 8883,
+      "auth": "tidak perlu",
+      "cocok_untuk": "testing"
+    },
+    "emqx_cloud": {
+      "host": "broker.emqx.io",
+      "port_tcp": 1883,
+      "auth": "tidak perlu",
+      "cocok_untuk": "testing & development"
+    },
+    "mosquitto_lokal": {
+      "host": "localhost",
+      "port": 1883,
+      "cara_install": "sudo apt install mosquitto (Linux) / choco install mosquitto (Windows)",
+      "cocok_untuk": "offline development"
+    }
+  }
+}

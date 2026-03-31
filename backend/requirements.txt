@@ -1,0 +1,24 @@
+# ============================================================
+#  FILE    : backend/requirements.txt
+#  FUNGSI  : Daftar library Python yang dibutuhkan
+#  INSTALL : pip install -r requirements.txt
+# ============================================================
+
+# MQTT client library — komunikasi dengan broker MQTT
+paho-mqtt==1.6.1
+
+# PostgreSQL adapter untuk Python
+psycopg2-binary>=2.9.9
+
+# Framework REST API ringan untuk endpoint /logs
+# (0.115.x = versi terbaru yang support Python 3.13)
+fastapi==0.115.12
+
+# ASGI server untuk menjalankan FastAPI
+uvicorn[standard]==0.34.0
+
+# Membaca file .env sebagai environment variable
+python-dotenv==1.0.1
+
+# Validasi data JSON — 2.11.x sudah ada wheel untuk Python 3.13 (tidak butuh Rust)
+pydantic==2.11.3
