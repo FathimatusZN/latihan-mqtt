@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Perangkat — Efortech</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="sidebar.css" />
+    <style>
+        /* ── BUTTON VARIANTS ────────────────────────────────── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity var(--transition);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+        }
+
+        .btn-primary svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .btn-sm {
+            padding: 3px 9px;
+            font-size: 11px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--txt2);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .btn-sm:hover {
+            background: var(--surface2);
+        }
+
+        .btn-sm.danger {
+            color: var(--crit);
+            border-color: var(--crit-border);
+        }
+
+        .btn-sm.danger:hover {
+            background: var(--crit-bg);
+        }
+
+        .btn-ghost {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--txt2);
+            cursor: pointer;
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface2);
+        }
+
+        .btn-danger {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--crit);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.88;
+        }
+
+        /* ── ACTION ROW ─────────────────────────────────────── */
+        .action-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ── STATUS BADGE ───────────────────────────────────── */
+        .status-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .status-on {
+            background: var(--ok-bg);
+            color: var(--ok);
+            border: 1px solid var(--ok-border);
+        }
+
+        .status-off {
+            background: var(--surface2);
+            color: var(--txt4);
+            border: 1px solid var(--border);
+        }
+
+        /* ── MODAL ──────────────────────────────────────────── */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            width: 420px;
+            max-width: 95vw;
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt1);
+        }
+
+        .modal-close {
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: none;
+            color: var(--txt3);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--surface2);
+            color: var(--txt1);
+        }
+
+        .modal-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .modal-foot {
+            padding: 12px 18px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* ── FORM ───────────────────────────────────────────── */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--txt2);
+        }
+
+        .form-input {
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--txt1);
+            font-size: 12px;
+            outline: none;
+            transition: border-color var(--transition);
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .form-hint {
+            font-size: 10px;
+            color: var(--txt4);
+            margin-top: 2px;
+        }
+
+        /* ── TOAST ──────────────────────────────────────────── */
+        .toast-wrap {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 200;
+        }
+
+        .toast {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slide-in 0.2s ease;
+            max-width: 300px;
+        }
+
+        .toast.ok {
+            background: var(--ok);
+        }
+
+        .toast.err {
+            background: var(--crit);
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateX(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ── CONFIRM ────────────────────────────────────────── */
+        .confirm-text {
+            font-size: 13px;
+            color: var(--txt2);
+            line-height: 1.6;
+        }
+
+        .confirm-name {
+            font-weight: 600;
+            color: var(--crit);
+        }
+
+        /* ── TABLE ──────────────────────────────────────────── */
+        .tbl-empty {
+            text-align: center;
+            color: var(--txt4);
+            padding: 40px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <!-- ── NAVBAR ──────────────────────────────────────────── -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round">
+                        <line class="hb-line" x1="2" y1="4" x2="14" y2="4" />
+                        <line class="hb-line" x1="2" y1="8" x2="14" y2="8" />
+                        <line class="hb-line" x1="2" y1="12" x2="14" y2="12" />
+                    </svg>
+                </button>
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                <span class="nav-brand">Monitoring Arus Mesin</span>
+                <span class="nav-sub">Efortech Industrial</span>
+            </div>
+            <div class="nav-right">
+                <span class="nav-clock" id="navClock">--:--:--</span>
+                <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Toggle tema">
+                    <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                    </svg>
+                    <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="display:none">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ── BODY AREA ────────────────────────────────────────── -->
+        <div class="body-area">
+
+            <!-- SIDEBAR -->
+            <nav class="sidebar" id="appSidebar">
+                <span class="sidebar-label">Menu</span>
+
+                <a href="index.html" data-tip="Dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+
+                <a href="devices.html" class="active" data-tip="Kelola Perangkat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" />
+                        <path d="M16 7V5a2 2 0 0 0-4 0v2M12 12v4M10 14h4" />
+                    </svg>
+                    <span class="nav-text">Kelola Perangkat</span>
+                </a>
+            </nav>
+
+            <!-- MAIN CONTENT -->
+            <main class="page-content">
+                <div class="page-header">
+                    <div>
+                        <div class="page-title">Kelola Perangkat</div>
+                        <div class="page-sub">Manajemen daftar mesin yang terdaftar di sistem</div>
+                    </div>
+                    <button class="btn-primary" onclick="openAdd()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Tambah Mesin
+                    </button>
+                </div>
+
+                <!-- TABLE CARD -->
+                <div class="card">
+                    <div class="card-head">
+                        <span class="card-title">Daftar Mesin</span>
+                        <span class="card-hint" id="totalMesin">—</span>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Mesin</th>
+                                    <th>Tipe</th>
+                                    <th>Lokasi</th>
+                                    <th>Batas Max</th>
+                                    <th>Batas Warning</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mesinTableBody">
+                                <tr>
+                                    <td colspan="7" class="tbl-empty">Memuat…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ── MODAL TAMBAH / EDIT ──────────────────────────────── -->
+    <div class="modal-backdrop" id="modalForm">
+        <div class="modal">
+            <div class="modal-head">
+                <span class="modal-title" id="modalFormTitle">Tambah Mesin</span>
+                <button class="modal-close" onclick="closeModal('modalForm')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="formMode" value="add" />
+                <input type="hidden" id="formOriginalName" value="" />
+
+                <div class="form-group">
+                    <label class="form-label">Nama Mesin <span style="color:var(--crit)">*</span></label>
+                    <input class="form-input" id="fNama" placeholder="contoh: Mesin_CNC_03" />
+                    <span class="form-hint">Unik, tidak bisa diubah setelah disimpan</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipe Mesin</label>
+                        <input class="form-input" id="fTipe" placeholder="contoh: CNC Milling" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lokasi</label>
+                        <input class="form-input" id="fLokasi" placeholder="contoh: Lantai 1 - Zona A" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Batas Arus Max (A) <span style="color:var(--crit)">*</span></label>
+                        <input class="form-input" id="fBatasMax" type="number" step="0.1" min="0" placeholder="20.0" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Batas Warning (A) <span style="color:var(--crit)">*</span></label>
+                        <input class="form-input" id="fBatasWarn" type="number" step="0.1" min="0" placeholder="15.0" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status Aktif</label>
+                    <select class="form-input" id="fAktif">
+                        <option value="true">Aktif</option>
+                        <option value="false">Nonaktif</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeModal('modalForm')">Batal</button>
+                <button class="btn-primary" onclick="submitForm()">
+                    <span id="btnSubmitLabel">Simpan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MODAL KONFIRMASI HAPUS ───────────────────────────── -->
+    <div class="modal-backdrop" id="modalConfirm">
+        <div class="modal">
+            <div class="modal-head">
+                <span class="modal-title">Konfirmasi Hapus</span>
+                <button class="modal-close" onclick="closeModal('modalConfirm')">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="confirm-text">
+                    Yakin ingin menghapus mesin <span class="confirm-name" id="confirmName">—</span>?<br />
+                    Semua log terkait mesin ini <strong>tidak akan terhapus</strong>, namun mesin tidak bisa menerima
+                    data baru.
+                </p>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeModal('modalConfirm')">Batal</button>
+                <button class="btn-danger" onclick="confirmDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TOAST ─────────────────────────────────────────────── -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+        let deleteTarget = null;
+
+        // ── THEME ──────────────────────────────────────────────────
+        let isDark = localStorage.getItem("theme") === "dark";
+        function applyTheme() {
+            document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+            document.getElementById("iconSun").style.display = isDark ? "none" : "block";
+            document.getElementById("iconMoon").style.display = isDark ? "block" : "none";
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        }
+        function toggleTheme() { isDark = !isDark; applyTheme(); }
+        applyTheme();
+
+        // ── CLOCK ──────────────────────────────────────────────────
+        function updateClock() {
+            const now = new Date(), p = n => String(n).padStart(2, "0");
+            document.getElementById("navClock").textContent =
+                `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // ── TOAST ──────────────────────────────────────────────────
+        function showToast(msg, type = "ok") {
+            const wrap = document.getElementById("toastWrap");
+            const t = document.createElement("div");
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            wrap.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        // ── MODAL ──────────────────────────────────────────────────
+        function openModal(id) { document.getElementById(id).classList.add("open"); }
+        function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+        document.querySelectorAll(".modal-backdrop").forEach(el => {
+            el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); });
+        });
+
+        // ── LOAD DATA ──────────────────────────────────────────────
+        async function loadMesin() {
+            try {
+                const res = await fetch(`${API_BASE}/mesin`);
+                const json = await res.json();
+                const data = json.data || [];
+                document.getElementById("totalMesin").textContent = `${data.length} mesin terdaftar`;
+                renderTable(data);
+            } catch {
+                document.getElementById("mesinTableBody").innerHTML =
+                    `<tr><td colspan="7" class="tbl-empty">Gagal memuat data</td></tr>`;
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById("mesinTableBody");
+            if (!data.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="tbl-empty">Belum ada mesin terdaftar</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map(m => `
+    <tr>
+      <td style="font-weight:500">${m.nama_mesin.replace(/_/g, " ")}</td>
+      <td class="txt-muted">${m.tipe_mesin || "—"}</td>
+      <td>${m.lokasi || "—"}</td>
+      <td class="txt-warn">${parseFloat(m.batas_arus_max).toFixed(1)} A</td>
+      <td class="txt-muted">${parseFloat(m.batas_arus_warning).toFixed(1)} A</td>
+      <td>
+        <span class="status-toggle ${m.aktif ? "status-on" : "status-off"}">
+          ${m.aktif ? "● Aktif" : "○ Nonaktif"}
+        </span>
+      </td>
+      <td>
+        <div class="action-row">
+          <button class="btn-sm" onclick='openEdit(${JSON.stringify(m)})'>Edit</button>
+          <button class="btn-sm danger" onclick="openDelete('${m.nama_mesin}')">Hapus</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+        }
+
+        // ── ADD ────────────────────────────────────────────────────
+        function openAdd() {
+            document.getElementById("formMode").value = "add";
+            document.getElementById("modalFormTitle").textContent = "Tambah Mesin";
+            document.getElementById("btnSubmitLabel").textContent = "Simpan";
+            document.getElementById("fNama").value = "";
+            document.getElementById("fNama").disabled = false;
+            document.getElementById("fTipe").value = "";
+            document.getElementById("fLokasi").value = "";
+            document.getElementById("fBatasMax").value = "20.0";
+            document.getElementById("fBatasWarn").value = "15.0";
+            document.getElementById("fAktif").value = "true";
+            openModal("modalForm");
+        }
+
+        // ── EDIT ───────────────────────────────────────────────────
+        function openEdit(m) {
+            document.getElementById("formMode").value = "edit";
+            document.getElementById("formOriginalName").value = m.nama_mesin;
+            document.getElementById("modalFormTitle").textContent = "Edit Mesin";
+            document.getElementById("btnSubmitLabel").textContent = "Update";
+            document.getElementById("fNama").value = m.nama_mesin;
+            document.getElementById("fNama").disabled = true;
+            document.getElementById("fTipe").value = m.tipe_mesin || "";
+            document.getElementById("fLokasi").value = m.lokasi || "";
+            document.getElementById("fBatasMax").value = parseFloat(m.batas_arus_max).toFixed(1);
+            document.getElementById("fBatasWarn").value = parseFloat(m.batas_arus_warning).toFixed(1);
+            document.getElementById("fAktif").value = m.aktif ? "true" : "false";
+            openModal("modalForm");
+        }
+
+        // ── SUBMIT ─────────────────────────────────────────────────
+        async function submitForm() {
+            const mode = document.getElementById("formMode").value;
+            const origName = document.getElementById("formOriginalName").value;
+            const nama = document.getElementById("fNama").value.trim();
+            const batasMax = parseFloat(document.getElementById("fBatasMax").value);
+            const batasWarn = parseFloat(document.getElementById("fBatasWarn").value);
+
+            if (!nama) return showToast("Nama mesin wajib diisi", "err");
+            if (isNaN(batasMax) || batasMax <= 0) return showToast("Batas Max harus angka positif", "err");
+            if (isNaN(batasWarn) || batasWarn <= 0) return showToast("Batas Warning harus angka positif", "err");
+            if (batasWarn >= batasMax) return showToast("Batas Warning harus lebih kecil dari Batas Max", "err");
+
+            const body = {
+                tipe_mesin: document.getElementById("fTipe").value.trim() || null,
+                lokasi: document.getElementById("fLokasi").value.trim() || null,
+                batas_arus_max: batasMax,
+                batas_arus_warning: batasWarn,
+                aktif: document.getElementById("fAktif").value === "true"
+            };
+
+            try {
+                let res;
+                if (mode === "add") {
+                    res = await fetch(`${API_BASE}/mesin`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ nama_mesin: nama, ...body })
+                    });
+                } else {
+                    res = await fetch(`${API_BASE}/mesin/${encodeURIComponent(origName)}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(body)
+                    });
+                }
+
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal menyimpan", "err");
+
+                showToast(mode === "add" ? "Mesin berhasil ditambahkan ✓" : "Mesin berhasil diupdate ✓");
+                closeModal("modalForm");
+                loadMesin();
+            } catch {
+                showToast("Gagal terhubung ke server", "err");
+            }
+        }
+
+        // ── DELETE ─────────────────────────────────────────────────
+        function openDelete(nama) {
+            deleteTarget = nama;
+            document.getElementById("confirmName").textContent = nama.replace(/_/g, " ");
+            openModal("modalConfirm");
+        }
+
+        async function confirmDelete() {
+            if (!deleteTarget) return;
+            try {
+                const res = await fetch(`${API_BASE}/mesin/${encodeURIComponent(deleteTarget)}`, { method: "DELETE" });
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal menghapus", "err");
+                showToast(`${deleteTarget.replace(/_/g, " ")} berhasil dihapus`);
+                closeModal("modalConfirm");
+                deleteTarget = null;
+                loadMesin();
+            } catch {
+                showToast("Gagal terhubung ke server", "err");
+            }
+        }
+
+        // ── INIT ───────────────────────────────────────────────────
+        loadMesin();
+    </script>
+    <script src="sidebar.js"></script>
+</body>
+
+</html>
