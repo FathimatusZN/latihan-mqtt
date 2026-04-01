@@ -475,6 +475,89 @@ def get_daftar_mesin():
         if conn:
             release_db_conn(conn)
 
+@app.get("/mesin/status", summary="Status terkini semua mesin aktif")
+def get_status_mesin():
+    """
+    Gabungkan daftar_mesin dengan log terbaru dan statistik 24 jam.
+    Mesin yang belum pernah kirim data tetap muncul dengan nilai null.
+    """
+    conn = None
+    try:
+        conn = get_db_conn()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                dm.nama_mesin,
+                dm.tipe_mesin,
+                dm.lokasi,
+                dm.batas_arus_max,
+                dm.batas_arus_warning,
+
+                -- Log terbaru (bisa NULL kalau belum ada data)
+                latest.nilai_arus       AS nilai_arus_terkini,
+                latest.status_mesin     AS status_terkini,
+                latest.waktu_simpan     AS waktu_terkini,
+
+                -- Statistik 24 jam (bisa NULL kalau belum ada data)
+                stat.total_pembacaan,
+                stat.rata_rata_arus,
+                stat.puncak_arus,
+                stat.total_warning,
+                stat.total_critical
+
+            FROM daftar_mesin dm
+
+            -- JOIN log terbaru per mesin
+            LEFT JOIN LATERAL (
+                SELECT nilai_arus, status_mesin, waktu_simpan
+                FROM logs_mesin
+                WHERE nama_mesin = dm.nama_mesin
+                ORDER BY waktu_simpan DESC
+                LIMIT 1
+            ) latest ON TRUE
+
+            -- JOIN statistik 24 jam
+            LEFT JOIN (
+                SELECT
+                    nama_mesin,
+                    COUNT(*)                              AS total_pembacaan,
+                    ROUND(AVG(nilai_arus)::NUMERIC, 2)   AS rata_rata_arus,
+                    ROUND(MAX(nilai_arus)::NUMERIC, 2)   AS puncak_arus,
+                    COUNT(*) FILTER (WHERE status_mesin = 'WARNING')  AS total_warning,
+                    COUNT(*) FILTER (WHERE status_mesin = 'CRITICAL') AS total_critical
+                FROM logs_mesin
+                WHERE waktu_simpan >= NOW() - INTERVAL '24 hours'
+                GROUP BY nama_mesin
+            ) stat ON stat.nama_mesin = dm.nama_mesin
+
+            WHERE dm.aktif = TRUE
+            ORDER BY dm.nama_mesin
+        """)
+
+        rows = cursor.fetchall()
+        columns = [
+            "nama_mesin", "tipe_mesin", "lokasi", "batas_arus_max", "batas_arus_warning",
+            "nilai_arus_terkini", "status_terkini", "waktu_terkini",
+            "total_pembacaan", "rata_rata_arus", "puncak_arus",
+            "total_warning", "total_critical"
+        ]
+        result = [dict(zip(columns, row)) for row in rows]
+
+        # Serialisasi datetime agar JSON-able
+        for r in result:
+            if r["waktu_terkini"]:
+                r["waktu_terkini"] = r["waktu_terkini"].isoformat()
+
+        return {"total": len(result), "data": result}
+
+    except psycopg2.Error as e:
+        logger.error(f"❌ Error query status mesin: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn:
+            release_db_conn(conn)
+            
 class MesinCreate(BaseModel):
     nama_mesin: str
     tipe_mesin: Optional[str] = None
