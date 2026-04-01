@@ -75,9 +75,7 @@ const badge = (s) => {
 // ── GAUGE SVG ─────────────────────────────────────────────
 function buildGaugeSVG(nilai, maxVal, status) {
   const pct = Math.min(nilai / maxVal, 1);
-  const r = 30,
-    cx = 40,
-    cy = 38;
+  const r = 30;
   const len = Math.PI * r;
   const fill = pct * len;
   const gap = len - fill + 1;
@@ -96,40 +94,130 @@ function buildGaugeSVG(nilai, maxVal, status) {
 }
 
 // ── RENDER GAUGES ─────────────────────────────────────────
-function renderGauges(statData, logData) {
+// Terima data dari /mesin/status — semua mesin aktif selalu muncul
+function renderGauges(mesinData) {
   const grid = document.getElementById("gaugeGrid");
-  if (!statData || statData.length === 0) {
-    grid.innerHTML = `<div class="empty-state">Belum ada data — kirim payload via MQTTX</div>`;
+
+  if (!mesinData || mesinData.length === 0) {
+    grid.innerHTML = `<div class="empty-state">Belum ada mesin terdaftar — tambahkan via halaman Kelola Perangkat</div>`;
     return;
   }
 
-  const latestLog = {};
-  (logData || []).forEach((r) => {
-    if (!latestLog[r.nama_mesin]) latestLog[r.nama_mesin] = r;
-  });
+  grid.innerHTML = mesinData
+    .map((m) => {
+      const hasData =
+        m.nilai_arus_terkini !== null && m.nilai_arus_terkini !== undefined;
+      const arus = hasData ? parseFloat(m.nilai_arus_terkini) : 0;
+      const status = hasData ? m.status_terkini || "NORMAL" : null;
+      const maxVal = parseFloat(m.batas_arus_max) || 25;
+      const c = status ? statusClass(status) : "";
 
-  grid.innerHTML = statData
-    .map((stat) => {
-      const latest = latestLog[stat.nama_mesin];
-      const arus = latest
-        ? parseFloat(latest.nilai_arus)
-        : parseFloat(stat.rata_rata_arus);
-      const status = latest ? latest.status_mesin : "NORMAL";
-      const lokasi = latest?.lokasi || "—";
-      const maxVal = 25;
-      const c = statusClass(status);
+      // Badge: kalau belum ada data, tampilkan "BELUM ADA DATA"
+      const statusBadge = hasData
+        ? badge(status)
+        : `<span class="badge" style="background:var(--surface2);color:var(--txt4);border:1px solid var(--border)">NO DATA</span>`;
+
+      // Nilai arus: tampilkan "—" kalau belum ada data
+      const arusDisplay = hasData ? arus.toFixed(1) : "—";
+      const arusClass = hasData ? `txt-${c}` : "txt-muted";
 
       return `
       <div class="gauge-item">
-        <div class="gauge-name">${stat.nama_mesin.replace(/_/g, " ")}</div>
-        ${buildGaugeSVG(arus, maxVal, status)}
-        <div class="gauge-val txt-${c}">${arus.toFixed(1)}</div>
+        <div class="gauge-name">${m.nama_mesin.replace(/_/g, " ")}</div>
+        ${buildGaugeSVG(arus, maxVal, status || "NORMAL")}
+        <div class="gauge-val ${arusClass}">${arusDisplay}</div>
         <div class="gauge-unit">Ampere</div>
-        ${badge(status)}
-        <div class="gauge-loc">${lokasi}</div>
+        ${statusBadge}
+        <div class="gauge-loc">${m.lokasi || "—"}</div>
       </div>`;
     })
     .join("");
+}
+
+// ── RENDER STATISTIK ──────────────────────────────────────
+// Terima data dari /mesin/status — mesin tanpa data tampil dengan "—"
+function renderStatistik(mesinData) {
+  const tbody = document.getElementById("statBody");
+
+  if (!mesinData || mesinData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-cell">Belum ada mesin terdaftar</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = mesinData
+    .map((m) => {
+      const hasData =
+        m.total_pembacaan !== null && m.total_pembacaan !== undefined;
+      const rata = hasData
+        ? parseFloat(m.rata_rata_arus).toFixed(1) + " A"
+        : "—";
+      const puncak = hasData
+        ? parseFloat(m.puncak_arus).toFixed(1) + " A"
+        : "—";
+      const warn = hasData ? m.total_warning : "—";
+      const crit = hasData ? m.total_critical : "—";
+
+      const warnClass =
+        hasData && m.total_warning > 0 ? "txt-warn" : "txt-muted";
+      const critClass =
+        hasData && m.total_critical > 0 ? "txt-crit" : "txt-muted";
+
+      return `
+      <tr>
+        <td style="font-weight:500">${m.nama_mesin.replace(/_/g, " ")}</td>
+        <td class="txt-muted">${rata}</td>
+        <td class="txt-warn">${puncak}</td>
+        <td class="${warnClass}">${warn}</td>
+        <td class="${critClass}">${crit}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
+// ── RENDER KPI ────────────────────────────────────────────
+function renderKPI(mesinData) {
+  const totalLog = mesinData.reduce(
+    (s, m) => s + (parseInt(m.total_pembacaan) || 0),
+    0,
+  );
+  const totalWarn = mesinData.reduce(
+    (s, m) => s + (parseInt(m.total_warning) || 0),
+    0,
+  );
+  const totalCrit = mesinData.reduce(
+    (s, m) => s + (parseInt(m.total_critical) || 0),
+    0,
+  );
+
+  // Rata-rata hanya dari mesin yang ada datanya
+  const mesinDenganData = mesinData.filter((m) => m.rata_rata_arus !== null);
+  const avgArus = mesinDenganData.length
+    ? (
+        mesinDenganData.reduce((s, m) => s + parseFloat(m.rata_rata_arus), 0) /
+        mesinDenganData.length
+      ).toFixed(1)
+    : null;
+
+  document.getElementById("kTotal").textContent = totalLog;
+  document.getElementById("kAktif").textContent = mesinData.length;
+  document.getElementById("kWarn").textContent = totalWarn;
+  document.getElementById("kCrit").textContent = totalCrit;
+  document.getElementById("kAvg").textContent =
+    avgArus !== null ? `${avgArus} A` : "—";
+
+  // Alert banner
+  const banner = document.getElementById("alertBanner");
+  if (totalCrit > 0) {
+    const critMachines = mesinData
+      .filter((m) => m.total_critical > 0)
+      .map((m) => m.nama_mesin.replace(/_/g, " "))
+      .join(", ");
+    document.getElementById("alertText").textContent =
+      `${totalCrit} CRITICAL terdeteksi pada: ${critMachines}`;
+    banner.style.display = "flex";
+  } else {
+    banner.style.display = "none";
+  }
 }
 
 // ── FETCH LOGS ────────────────────────────────────────────
@@ -164,6 +252,7 @@ async function fetchLogs() {
       </tr>`;
       })
       .join("");
+
     return rows;
   } catch {
     document.getElementById("logBody").innerHTML =
@@ -172,71 +261,7 @@ async function fetchLogs() {
   }
 }
 
-// ── FETCH STATISTIK ───────────────────────────────────────
-async function fetchStat() {
-  try {
-    const res = await fetch(`${API_BASE}/statistik`);
-    const json = await res.json();
-    const data = json.data || [];
-
-    // KPI
-    const totalLog = data.reduce((s, d) => s + (d.total_pembacaan || 0), 0);
-    const totalWarn = data.reduce((s, d) => s + (d.total_warning || 0), 0);
-    const totalCrit = data.reduce((s, d) => s + (d.total_critical || 0), 0);
-    const avgArus = data.length
-      ? (
-          data.reduce((s, d) => s + parseFloat(d.rata_rata_arus || 0), 0) /
-          data.length
-        ).toFixed(1)
-      : "—";
-
-    document.getElementById("kTotal").textContent = totalLog;
-    document.getElementById("kAktif").textContent = data.length;
-    document.getElementById("kWarn").textContent = totalWarn;
-    document.getElementById("kCrit").textContent = totalCrit;
-    document.getElementById("kAvg").textContent =
-      avgArus !== "—" ? `${avgArus} A` : "—";
-
-    // Alert banner
-    const banner = document.getElementById("alertBanner");
-    if (totalCrit > 0) {
-      const critMachines = data
-        .filter((d) => d.total_critical > 0)
-        .map((d) => d.nama_mesin.replace(/_/g, " "))
-        .join(", ");
-      document.getElementById("alertText").textContent =
-        `${totalCrit} CRITICAL terdeteksi pada: ${critMachines}`;
-      banner.style.display = "flex";
-    } else {
-      banner.style.display = "none";
-    }
-
-    // Tabel statistik
-    const tbody = document.getElementById("statBody");
-    if (!data.length) {
-      tbody.innerHTML = `<tr><td colspan="5" class="empty-cell">Belum ada data</td></tr>`;
-      return data;
-    }
-    tbody.innerHTML = data
-      .map(
-        (d) => `
-      <tr>
-        <td style="font-weight:500">${d.nama_mesin.replace(/_/g, " ")}</td>
-        <td>${parseFloat(d.rata_rata_arus).toFixed(1)} A</td>
-        <td class="txt-warn">${parseFloat(d.puncak_arus).toFixed(1)} A</td>
-        <td class="${d.total_warning > 0 ? "txt-warn" : "txt-muted"}">${d.total_warning}</td>
-        <td class="${d.total_critical > 0 ? "txt-crit" : "txt-muted"}">${d.total_critical}</td>
-      </tr>`,
-      )
-      .join("");
-
-    return data;
-  } catch {
-    return [];
-  }
-}
-
-// ── FETCH MESIN LIST ──────────────────────────────────────
+// ── FETCH MESIN LIST (untuk dropdown filter) ──────────────
 async function fetchMesinList() {
   try {
     const res = await fetch(`${API_BASE}/mesin`);
@@ -258,15 +283,27 @@ async function fetchMesinList() {
 // ── FETCH ALL ─────────────────────────────────────────────
 async function fetchAll() {
   try {
-    const [statData, logData] = await Promise.all([fetchStat(), fetchLogs()]);
-    renderGauges(statData, logData);
+    // Satu endpoint /mesin/status menggantikan /statistik untuk gauge + stat tabel
+    const [mesinRes, _] = await Promise.all([
+      fetch(`${API_BASE}/mesin/status`),
+      fetchLogs(),
+    ]);
+
+    const mesinJson = await mesinRes.json();
+    const mesinData = mesinJson.data || [];
+
+    renderKPI(mesinData);
+    renderGauges(mesinData);
+    renderStatistik(mesinData);
+
     const now = new Date();
     document.getElementById("lastUpdate").textContent =
       `Update: ${fmtTime(now)}`;
     document.getElementById("footerUpdate").textContent =
       `Terakhir update: ${now.toLocaleTimeString("id-ID")}`;
+
     setConnected(true);
-  } catch {
+  } catch (e) {
     setConnected(false);
   }
 }
