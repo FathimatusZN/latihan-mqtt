@@ -103,21 +103,34 @@ def release_db_conn(conn):
 # Dipanggil setiap kali pesan MQTT diterima
 # ============================================================
 def simpan_ke_database(data: dict):
-    """
-    Menerima dictionary hasil parse JSON,
-    lalu INSERT ke tabel logs_mesin di PostgreSQL.
-    """
     conn = None
     try:
-        # Ambil koneksi dari pool
         conn = get_db_conn()
         cursor = conn.cursor()
 
-        # Tentukan status berdasarkan nilai arus
-        # Logika ini bisa disesuaikan dengan kebutuhan industri
-        nilai_arus    = float(data["nilai_arus"])
-        batas_max     = float(data.get("batas_arus_max", 20.0))
-        batas_warning = batas_max * 0.75  # 75% dari batas max = warning
+        nama_mesin = data.get("nama_mesin", "Unknown")
+
+        # ── LOOKUP konfigurasi dari daftar_mesin ──────────────
+        # Prioritas: ambil dari DB, payload hanya fallback
+        cursor.execute("""
+            SELECT batas_arus_max, batas_arus_warning, lokasi
+            FROM daftar_mesin
+            WHERE nama_mesin = %s AND aktif = TRUE
+        """, (nama_mesin,))
+        row = cursor.fetchone()
+
+        if row:
+            batas_max     = float(row[0])
+            batas_warning = float(row[1])
+            lokasi        = row[2]  # selalu dari DB
+        else:
+            # Mesin tidak terdaftar — pakai nilai dari payload sebagai fallback
+            batas_max     = float(data.get("batas_arus_max", 20.0))
+            batas_warning = batas_max * 0.75
+            lokasi        = data.get("lokasi", None)
+            logger.warning(f"⚠️  Mesin '{nama_mesin}' tidak ada di daftar_mesin, pakai nilai payload")
+
+        nilai_arus = float(data["nilai_arus"])
 
         if nilai_arus >= batas_max:
             status = "CRITICAL"
@@ -126,49 +139,33 @@ def simpan_ke_database(data: dict):
         else:
             status = "NORMAL"
 
-        # Query INSERT dengan parameterized query (aman dari SQL Injection)
         query = """
             INSERT INTO logs_mesin
                 (nama_mesin, nilai_arus, status_mesin, batas_arus_max,
                  lokasi, keterangan, waktu_sensor)
-            VALUES
-                (%s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-
-        # Nilai yang akan dimasukkan (urutan harus sesuai dengan query di atas)
         values = (
-            data.get("nama_mesin", "Unknown"),  # nama mesin dari payload
-            nilai_arus,                          # nilai arus (Ampere)
-            status,                              # NORMAL / WARNING / CRITICAL
-            batas_max,                           # batas arus maksimum
-            data.get("lokasi", None),            # lokasi mesin (opsional)
-            data.get("keterangan", None),        # catatan tambahan (opsional)
-            data.get("waktu_sensor", None)       # timestamp dari sensor (opsional)
+            nama_mesin,
+            nilai_arus,
+            status,
+            batas_max,
+            lokasi,                         
+            data.get("keterangan", None),
+            data.get("waktu_sensor", None)
         )
 
-        cursor.execute(query, values)  # Jalankan query
-        conn.commit()                  # Simpan transaksi ke database
-
-        logger.info(
-            f"💾 Data tersimpan | Mesin: {data.get('nama_mesin')} | "
-            f"Arus: {nilai_arus:.2f}A | Status: {status}"
-        )
+        cursor.execute(query, values)
+        conn.commit()
+        logger.info(f"💾 Data tersimpan | Mesin: {nama_mesin} | Arus: {nilai_arus:.2f}A | Status: {status}")
 
     except psycopg2.Error as e:
-        # Jika ada error database, rollback transaksi
-        if conn:
-            conn.rollback()
+        if conn: conn.rollback()
         logger.error(f"❌ Error database: {e}")
-
     except (ValueError, KeyError) as e:
-        # Jika payload tidak valid (field tidak ada atau tipe data salah)
         logger.error(f"❌ Data tidak valid: {e} | Payload: {data}")
-
     finally:
-        # Selalu kembalikan koneksi ke pool, apapun yang terjadi
-        if conn:
-            release_db_conn(conn)
-
+        if conn: release_db_conn(conn)
 
 # ============================================================
 # MQTT CALLBACK FUNCTIONS
@@ -328,7 +325,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],   # Di production, ganti dengan domain frontend spesifik
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -478,6 +475,106 @@ def get_daftar_mesin():
         if conn:
             release_db_conn(conn)
 
+class MesinCreate(BaseModel):
+    nama_mesin: str
+    tipe_mesin: Optional[str] = None
+    lokasi: Optional[str] = None
+    batas_arus_max: float = 20.0
+    batas_arus_warning: float = 15.0
+    aktif: bool = True
+
+class MesinUpdate(BaseModel):
+    tipe_mesin: Optional[str] = None
+    lokasi: Optional[str] = None
+    batas_arus_max: Optional[float] = None
+    batas_arus_warning: Optional[float] = None
+    aktif: Optional[bool] = None
+
+
+@app.post("/mesin", summary="Tambah mesin baru")
+def tambah_mesin(body: MesinCreate):
+    conn = None
+    try:
+        conn = get_db_conn()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO daftar_mesin
+                (nama_mesin, tipe_mesin, lokasi, batas_arus_max, batas_arus_warning, aktif)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """, (body.nama_mesin, body.tipe_mesin, body.lokasi,
+              body.batas_arus_max, body.batas_arus_warning, body.aktif))
+        new_id = cursor.fetchone()[0]
+        conn.commit()
+        return {"success": True, "id": new_id, "nama_mesin": body.nama_mesin}
+    except psycopg2.errors.UniqueViolation:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=409, detail=f"Mesin '{body.nama_mesin}' sudah ada")
+    except psycopg2.Error as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn: release_db_conn(conn)
+
+
+@app.put("/mesin/{nama_mesin}", summary="Update konfigurasi mesin")
+def update_mesin(nama_mesin: str, body: MesinUpdate):
+    conn = None
+    try:
+        conn = get_db_conn()
+        cursor = conn.cursor()
+
+        fields, values = [], []
+        if body.tipe_mesin is not None:
+            fields.append("tipe_mesin = %s"); values.append(body.tipe_mesin)
+        if body.lokasi is not None:
+            fields.append("lokasi = %s"); values.append(body.lokasi)
+        if body.batas_arus_max is not None:
+            fields.append("batas_arus_max = %s"); values.append(body.batas_arus_max)
+        if body.batas_arus_warning is not None:
+            fields.append("batas_arus_warning = %s"); values.append(body.batas_arus_warning)
+        if body.aktif is not None:
+            fields.append("aktif = %s"); values.append(body.aktif)
+
+        if not fields:
+            raise HTTPException(status_code=400, detail="Tidak ada field yang diupdate")
+
+        values.append(nama_mesin)
+        cursor.execute(
+            f"UPDATE daftar_mesin SET {', '.join(fields)} WHERE nama_mesin = %s",
+            values
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail=f"Mesin '{nama_mesin}' tidak ditemukan")
+        conn.commit()
+        return {"success": True, "nama_mesin": nama_mesin}
+    except HTTPException:
+        raise
+    except psycopg2.Error as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn: release_db_conn(conn)
+
+
+@app.delete("/mesin/{nama_mesin}", summary="Hapus mesin")
+def hapus_mesin(nama_mesin: str):
+    conn = None
+    try:
+        conn = get_db_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM daftar_mesin WHERE nama_mesin = %s", (nama_mesin,))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail=f"Mesin '{nama_mesin}' tidak ditemukan")
+        conn.commit()
+        return {"success": True, "deleted": nama_mesin}
+    except HTTPException:
+        raise
+    except psycopg2.Error as e:
+        if conn: conn.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn: release_db_conn(conn)
 
 # ============================================================
 # ENTRY POINT
