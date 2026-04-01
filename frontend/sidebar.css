@@ -1,0 +1,201 @@
+/* ============================================================
+   FILE  : frontend/sidebar.css
+   FUNGSI: Shared sidebar styles — collapsible to hamburger
+============================================================ */
+
+/* ── APP SHELL ──────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+.body-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────── */
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  gap: 2px;
+  overflow: hidden;
+  transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 5;
+}
+.sidebar.collapsed {
+  width: 48px;
+}
+
+/* Labels — hidden when collapsed */
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--txt4);
+  padding: 8px 16px 4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 160ms ease;
+}
+.sidebar.collapsed .sidebar-label {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Nav links */
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 16px;
+  font-size: 12.5px;
+  color: var(--txt2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background var(--transition),
+    color var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.sidebar.collapsed a {
+  padding: 8px 0;
+  justify-content: center;
+}
+.sidebar a:hover {
+  background: var(--surface2);
+  color: var(--txt1);
+}
+.sidebar a.active {
+  background: var(--surface2);
+  color: var(--accent);
+  font-weight: 600;
+  border-right: 2px solid var(--accent);
+}
+.sidebar a svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Link text span — fades out when collapsed */
+.sidebar a .nav-text {
+  opacity: 1;
+  transition: opacity 160ms ease;
+  white-space: nowrap;
+}
+.sidebar.collapsed a .nav-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Tooltip on collapsed state */
+.sidebar.collapsed a[data-tip] {
+  position: relative;
+}
+.sidebar.collapsed a[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--txt1);
+  color: var(--surface);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+/* ── HAMBURGER TOGGLE BUTTON ────────────────────────────── */
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--txt3);
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    color var(--transition),
+    transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover {
+  background: var(--surface2);
+  color: var(--txt1);
+}
+.sidebar-toggle svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hamburger lines animation */
+.hb-line {
+  transition: all 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+/* ── MAIN CONTENT AREA ──────────────────────────────────── */
+.page-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  min-width: 0;
+  transition: padding 240ms ease;
+}
+
+/* ── PAGE HEADER ────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.page-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--txt1);
+}
+.page-sub {
+  font-size: 12px;
+  color: var(--txt3);
+  margin-top: 2px;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 20;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.1);
+  }
+  .sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    border: none;
+  }
+}
