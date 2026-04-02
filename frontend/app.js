@@ -4,7 +4,7 @@
  * CATATAN : Ganti API_BASE jika backend berjalan di port / host lain
  */
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = window.APP_CONFIG?.API_BASE ?? "http://localhost:8000";
 const REFRESH_INTERVAL = 5000;
 const LOG_LIMIT = 100;
 
