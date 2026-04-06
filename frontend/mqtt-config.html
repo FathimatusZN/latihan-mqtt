@@ -1,12 +1,11 @@
-<!-- frontend\mqtt-config.html -->
-
+<!-- frontend/mqtt-config.html — v2.0 -->
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Konfigurasi MQTT — Efortech</title>
+    <title>Konfigurasi MQTT — Efortech v2</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="sidebar.css" />
     <style>
@@ -22,56 +21,53 @@
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: opacity var(--transition);
+            transition: opacity var(--transition)
         }
 
         .btn-primary:hover {
-            opacity: 0.88;
+            opacity: .88
         }
 
-        .btn-sm {
-            padding: 3px 9px;
-            font-size: 11px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
+        .broker-panel {
             background: var(--surface);
-            color: var(--txt2);
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-
-        .btn-sm:hover {
-            background: var(--surface2);
-        }
-
-        .btn-sm.accent {
-            color: var(--accent);
-            border-color: #bfdbfe;
-        }
-
-        .btn-sm.accent:hover {
-            background: #eff6ff;
-        }
-
-        [data-theme="dark"] .btn-sm.accent:hover {
-            background: #1e3a5f;
-        }
-
-        .btn-ghost {
-            padding: 6px 14px;
-            font-size: 12px;
-            border-radius: var(--radius-sm);
             border: 1px solid var(--border);
-            background: transparent;
-            color: var(--txt2);
-            cursor: pointer;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 20px
         }
 
-        .btn-ghost:hover {
-            background: var(--surface2);
+        .broker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 12px
         }
 
-        /* Copy button */
+        .broker-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px
+        }
+
+        .broker-field-label {
+            font-size: 10px;
+            color: var(--txt4);
+            text-transform: uppercase;
+            letter-spacing: .4px
+        }
+
+        .broker-field-val {
+            font-size: 12px;
+            color: var(--txt1);
+            font-weight: 500
+        }
+
+        .broker-field-val.mono {
+            font-family: ui-monospace, monospace;
+            color: var(--accent);
+            font-size: 11px
+        }
+
         .btn-copy {
             display: inline-flex;
             align-items: center;
@@ -83,154 +79,30 @@
             background: transparent;
             color: var(--txt4);
             cursor: pointer;
-            transition: all var(--transition);
+            transition: all var(--transition)
         }
 
         .btn-copy svg {
             width: 11px;
-            height: 11px;
+            height: 11px
         }
 
         .btn-copy:hover {
             background: var(--surface2);
-            color: var(--txt2);
+            color: var(--txt2)
         }
 
         .btn-copy.copied {
             color: var(--ok);
             border-color: var(--ok-border);
-            background: var(--ok-bg);
-        }
-
-        /* Summary cards */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .summary-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .summary-label {
-            font-size: 11px;
-            color: var(--txt3);
-        }
-
-        .summary-val {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--txt1);
-            line-height: 1;
-        }
-
-        .summary-sub {
-            font-size: 10px;
-            color: var(--txt4);
-            margin-top: 2px;
-        }
-
-        .summary-val.mono {
-            font-size: 13px;
-            font-family: ui-monospace, monospace;
-            color: var(--accent);
-        }
-
-        /* Broker info panel */
-        .broker-panel {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .broker-panel-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .broker-panel-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--txt2);
-        }
-
-        .broker-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-
-        .broker-field {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .broker-field-label {
-            font-size: 10px;
-            color: var(--txt4);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .broker-field-val {
-            font-size: 12px;
-            color: var(--txt1);
-            font-weight: 500;
-        }
-
-        .broker-field-val.mono {
-            font-family: ui-monospace, monospace;
-            color: var(--accent);
-            font-size: 11px;
-        }
-
-        /* Topic pills */
-        .topic-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-family: ui-monospace, monospace;
-        }
-
-        .topic-custom {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-
-        .topic-global {
-            background: var(--surface2);
-            color: var(--txt3);
-            border: 1px solid var(--border);
-        }
-
-        [data-theme="dark"] .topic-custom {
-            background: #1e3a5f;
-            color: #93c5fd;
-            border-color: #1d4ed8;
+            background: var(--ok-bg)
         }
 
         .subscribed-list {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 8px;
+            padding: 14px
         }
 
         .subscribed-tag {
@@ -243,7 +115,7 @@
             font-family: ui-monospace, monospace;
             background: var(--ok-bg);
             color: var(--ok);
-            border: 1px solid var(--ok-border);
+            border: 1px solid var(--ok-border)
         }
 
         .subscribed-dot {
@@ -251,164 +123,26 @@
             height: 6px;
             border-radius: 50%;
             background: currentColor;
-            animation: blink 1.4s ease infinite;
+            animation: blink 1.4s ease infinite
         }
 
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1
-            }
-
-            50% {
-                opacity: .3
-            }
-        }
-
-        /* Topic summary table section */
         .two-col {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 20px
         }
 
-        @media (max-width: 800px) {
+        @media(max-width:800px) {
             .two-col {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr
             }
         }
 
-        /* Inline edit topic */
-        .topic-edit-wrap {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .topic-input {
-            flex: 1;
-            padding: 4px 8px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--surface);
-            color: var(--txt1);
-            font-size: 11px;
-            font-family: ui-monospace, monospace;
-            outline: none;
-            transition: border-color var(--transition);
-        }
-
-        .topic-input:focus {
-            border-color: var(--accent);
-        }
-
-        .topic-input::placeholder {
+        .tbl-empty {
+            text-align: center;
             color: var(--txt4);
-            font-size: 10px;
-        }
-
-        .modal-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-backdrop.open {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-            width: 440px;
-            max-width: 95vw;
-        }
-
-        .modal-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--txt1);
-        }
-
-        .modal-close {
-            width: 26px;
-            height: 26px;
-            border: none;
-            background: none;
-            color: var(--txt3);
-            cursor: pointer;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .modal-close:hover {
-            background: var(--surface2);
-        }
-
-        .modal-body {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
-        }
-
-        .modal-foot {
-            padding: 12px 18px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-label {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--txt2);
-        }
-
-        .form-input {
-            padding: 7px 10px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--surface);
-            color: var(--txt1);
-            font-size: 12px;
-            outline: none;
-            transition: border-color var(--transition);
-        }
-
-        .form-input:focus {
-            border-color: var(--accent);
-        }
-
-        .form-hint {
-            font-size: 10px;
-            color: var(--txt4);
+            padding: 32px !important
         }
 
         .toast-wrap {
@@ -418,7 +152,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            z-index: 200;
+            z-index: 200
         }
 
         .toast {
@@ -428,46 +162,34 @@
             font-weight: 500;
             color: #fff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: slide-in 0.2s ease;
-            max-width: 320px;
+            animation: slide-in .2s ease;
+            max-width: 320px
         }
 
         .toast.ok {
-            background: var(--ok);
+            background: var(--ok)
         }
 
         .toast.err {
-            background: var(--crit);
+            background: var(--crit)
         }
 
         @keyframes slide-in {
             from {
                 transform: translateX(20px);
-                opacity: 0;
+                opacity: 0
             }
 
             to {
                 transform: translateX(0);
-                opacity: 1;
+                opacity: 1
             }
-        }
-
-        .tbl-empty {
-            text-align: center;
-            color: var(--txt4);
-            padding: 32px !important;
-        }
-
-        .saving {
-            opacity: 0.5;
-            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
     <div class="app-shell">
-
         <nav class="navbar">
             <div class="nav-left">
                 <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
@@ -481,8 +203,8 @@
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
-                <span class="nav-brand">Monitoring Arus Mesin</span>
-                <span class="nav-sub">Efortech Industrial</span>
+                <span class="nav-brand">Industrial IoT Monitor</span>
+                <span class="nav-sub">Efortech v2.0</span>
             </div>
             <div class="nav-right">
                 <span class="nav-clock" id="navClock">--:--:--</span>
@@ -540,7 +262,7 @@
                 <div class="page-header">
                     <div>
                         <div class="page-title">Konfigurasi MQTT</div>
-                        <div class="page-sub">Info broker dan pengaturan topic per perangkat</div>
+                        <div class="page-sub">Broker info, topic subscriptions, dan unknown messages</div>
                     </div>
                     <button class="btn-primary" onclick="forceSync()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -552,364 +274,195 @@
                     </button>
                 </div>
 
-                <!-- BROKER INFO -->
+                <!-- BROKER PANEL -->
                 <div class="broker-panel">
-                    <div class="broker-panel-head">
-                        <span class="broker-panel-title">Informasi Broker</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:12px;font-weight:600;color:var(--txt2)">Informasi Broker</span>
                         <span id="brokerStatus" style="font-size:11px;color:var(--txt4)">Memuat…</span>
                     </div>
-                    <div class="broker-grid" id="brokerGrid">
-                        <!-- filled by JS -->
-                    </div>
+                    <div class="broker-grid" id="brokerGrid"></div>
                 </div>
 
-                <!-- SUMMARY + SUBSCRIBED TOPICS -->
+                <!-- SUBSCRIBED + TAG TABLE -->
                 <div class="two-col">
-                    <!-- Topic summary -->
+                    <!-- Topic aktif -->
                     <div class="card">
                         <div class="card-head">
-                            <span class="card-title">Ringkasan per Topic</span>
+                            <span class="card-title">Topics Subscribed</span>
+                            <span class="card-hint" id="subCount">—</span>
                         </div>
-                        <div class="table-scroll">
+                        <div class="subscribed-list" id="subscribedList">
+                            <span style="font-size:12px;color:var(--txt4)">Memuat…</span>
+                        </div>
+                    </div>
+
+                    <!-- Unknown messages -->
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="card-title">Unknown Messages</span>
+                            <span class="card-hint" id="unknownCount">—</span>
+                        </div>
+                        <div class="table-scroll" style="max-height:220px">
                             <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>Topic</th>
-                                        <th>Mesin</th>
-                                        <th>Aktif</th>
-                                        <th>Pesan 24j</th>
+                                        <th>Alasan</th>
+                                        <th>Waktu</th>
                                     </tr>
                                 </thead>
-                                <tbody id="topicSummaryBody">
+                                <tbody id="unknownBody">
                                     <tr>
-                                        <td colspan="4" class="tbl-empty">Memuat…</td>
+                                        <td colspan="3" class="tbl-empty">Memuat…</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
-                    <!-- Subscribed topics live -->
-                    <div class="card">
-                        <div class="card-head">
-                            <span class="card-title">Topic Aktif (Subscribed)</span>
-                            <span class="card-hint" id="subCount">—</span>
-                        </div>
-                        <div style="padding:16px">
-                            <div class="subscribed-list" id="subscribedList">
-                                <span style="font-size:12px;color:var(--txt4)">Memuat…</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- PER-DEVICE TOPIC CONFIG -->
+                <!-- ALL TAGS TABLE -->
                 <div class="card">
                     <div class="card-head">
-                        <span class="card-title">Konfigurasi Topic per Perangkat</span>
-                        <span class="card-hint">Klik Edit untuk mengubah topic suatu mesin</span>
+                        <span class="card-title">Semua Tag & Topic</span>
+                        <span class="card-hint">Setiap tag = satu topic MQTT subscription</span>
                     </div>
                     <div class="table-scroll">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Mesin</th>
+                                    <th>Device</th>
+                                    <th>Tag</th>
+                                    <th>Satuan</th>
+                                    <th>MQTT Topic</th>
+                                    <th>Warning</th>
+                                    <th>Critical</th>
                                     <th>Status</th>
-                                    <th>Topic Custom</th>
-                                    <th>Topic Efektif</th>
-                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="deviceTopicBody">
+                            <tbody id="tagTableBody">
                                 <tr>
-                                    <td colspan="5" class="tbl-empty">Memuat…</td>
+                                    <td colspan="7" class="tbl-empty">Memuat…</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </main>
         </div>
     </div>
 
-    <!-- MODAL EDIT TOPIC -->
-    <div class="modal-backdrop" id="modalTopic">
-        <div class="modal">
-            <div class="modal-head">
-                <span class="modal-title">Edit Topic MQTT</span>
-                <button class="modal-close" onclick="closeModal('modalTopic')">×</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="editNamaMesin" />
-                <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">
-                    Mesin: <strong id="editNamaDisplay">—</strong>
-                    <span style="font-family:monospace;font-size:10px;color:var(--txt4);margin-left:6px"
-                        id="editNamaId"></span>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Topic MQTT</label>
-                    <input class="form-input" id="editTopic" placeholder="Kosongkan = pakai topic global"
-                        style="font-family:ui-monospace,monospace;font-size:12px" />
-                    <span class="form-hint" id="editTopicHint">—</span>
-                </div>
-            </div>
-            <div class="modal-foot">
-                <button class="btn-ghost" onclick="closeModal('modalTopic')">Batal</button>
-                <button class="btn-primary" onclick="saveTopic()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast-wrap" id="toastWrap"></div>
-
     <script src="config.js"></script>
     <script>
         const API_BASE = window.APP_CONFIG?.API_BASE ?? "http://localhost:8000";
-        let globalTopic = "—";
 
-        // ── THEME ──────────────────────────────────────────────────
         let isDark = localStorage.getItem("theme") === "dark";
-        function applyTheme() {
-            document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-            document.getElementById("iconSun").style.display = isDark ? "none" : "block";
-            document.getElementById("iconMoon").style.display = isDark ? "block" : "none";
-            localStorage.setItem("theme", isDark ? "dark" : "light");
-        }
+        function applyTheme() { document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light"); document.getElementById("iconSun").style.display = isDark ? "none" : "block"; document.getElementById("iconMoon").style.display = isDark ? "block" : "none"; localStorage.setItem("theme", isDark ? "dark" : "light"); }
         function toggleTheme() { isDark = !isDark; applyTheme(); }
         applyTheme();
-
-        // ── CLOCK ──────────────────────────────────────────────────
-        function updateClock() {
-            const now = new Date(), p = n => String(n).padStart(2, "0");
-            document.getElementById("navClock").textContent =
-                `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
-        }
+        function updateClock() { const now = new Date(), p = n => String(n).padStart(2, "0"); document.getElementById("navClock").textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`; }
         setInterval(updateClock, 1000); updateClock();
 
-        // ── TOAST ──────────────────────────────────────────────────
-        function showToast(msg, type = "ok") {
-            const t = document.createElement("div");
-            t.className = `toast ${type}`;
-            t.textContent = msg;
-            document.getElementById("toastWrap").appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+        function showToast(msg, type = "ok") { const t = document.createElement("div"); t.className = `toast ${type}`; t.textContent = msg; document.getElementById("toastWrap").appendChild(t); setTimeout(() => t.remove(), 3000); }
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (!btn) return showToast("Tersalin ✓");
+                btn.classList.add("copied"); const orig = btn.innerHTML; btn.innerHTML = "✓";
+                setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = orig; }, 1200);
+            });
         }
 
-        // ── MODAL ──────────────────────────────────────────────────
-        function openModal(id) { document.getElementById(id).classList.add("open"); }
-        function closeModal(id) { document.getElementById(id).classList.remove("open"); }
-        document.querySelectorAll(".modal-backdrop").forEach(el =>
-            el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); })
-        );
+        const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+        const fmtDT = iso => { if (!iso) return "—"; const d = new Date(iso), p = n => String(n).padStart(2, "0"); return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 
-        // ── LOAD BROKER INFO ───────────────────────────────────────
-        async function loadBrokerInfo() {
+        async function loadMqttInfo() {
             try {
                 const res = await fetch(`${API_BASE}/mqtt/info`);
                 const data = await res.json();
-                const b = data.broker;
-                globalTopic = b.topic_global;
 
                 document.getElementById("brokerStatus").textContent = "● Terhubung";
                 document.getElementById("brokerStatus").style.color = "var(--ok)";
 
-                const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-
                 document.getElementById("brokerGrid").innerHTML = `
-                <div class="broker-field">
-                <span class="broker-field-label">Host</span>
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span class="broker-field-val mono">${b.host}</span>
-                    <button class="btn-copy" onclick="copyText('${b.host}', this)">${copyIcon}</button>
-                </div>
-                </div>
+      <div class="broker-field"><span class="broker-field-label">Total Topics</span>
+        <span class="broker-field-val">${data.total_topics} topics</span></div>
+      <div class="broker-field"><span class="broker-field-label">Architecture</span>
+        <span class="broker-field-val mono">pabrik/{factory}/{device}/{tag}</span></div>`;
 
-                <div class="broker-field">
-                <span class="broker-field-label">Port</span>
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span class="broker-field-val">${b.port}</span>
-                    <button class="btn-copy" onclick="copyText('${b.port}', this)">${copyIcon}</button>
-                </div>
-                </div>
-
-                <div class="broker-field">
-                <span class="broker-field-label">Client ID</span>
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span class="broker-field-val mono">${b.client_id}</span>
-                    <button class="btn-copy" onclick="copyText('${b.client_id}', this)">${copyIcon}</button>
-                </div>
-                </div>
-
-                <div class="broker-field">
-                <span class="broker-field-label">Topic Global</span>
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span class="broker-field-val mono">${b.topic_global}</span>
-                    <button class="btn-copy" onclick="copyText('${b.topic_global}', this)">${copyIcon}</button>
-                </div>
-                </div>
-                `;
-
-                // Subscribed topics
                 const subs = data.subscribed_topics || [];
                 document.getElementById("subCount").textContent = `${subs.length} topic`;
                 document.getElementById("subscribedList").innerHTML = subs.length
                     ? subs.map(t => `
-          <span class="subscribed-tag">
-            <span class="subscribed-dot"></span>${t}
-          </span>`).join("")
+        <span class="subscribed-tag">
+          <span class="subscribed-dot"></span>${t}
+          <button class="btn-copy" onclick="copyText('${t}',this)" style="margin-left:2px">${copyIcon}</button>
+        </span>`).join("")
                     : `<span style="font-size:12px;color:var(--txt4)">Belum ada topic aktif</span>`;
-
-                // Topic summary table
-                const tbody = document.getElementById("topicSummaryBody");
-                if (!data.topic_summary || !data.topic_summary.length) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="tbl-empty">Belum ada data</td></tr>`;
-                } else {
-                    tbody.innerHTML = data.topic_summary.map(ts => `
-        <tr>
-          <td style="font-family:monospace;font-size:11px">${ts.topic}</td>
-          <td>${ts.total_mesin}</td>
-          <td class="txt-ok">${ts.mesin_aktif}</td>
-          <td class="txt-muted">${ts.pesan_24j}</td>
-        </tr>`).join("");
-                }
-
-                return data;
-            } catch (e) {
+            } catch {
                 document.getElementById("brokerStatus").textContent = "● Gagal terhubung";
                 document.getElementById("brokerStatus").style.color = "var(--crit)";
-                document.getElementById("brokerGrid").innerHTML =
-                    `<span style="font-size:12px;color:var(--crit)">Tidak dapat mengambil info broker</span>`;
             }
         }
 
-        // ── LOAD DEVICE TOPICS ─────────────────────────────────────
-        async function loadDeviceTopics() {
+        async function loadTagTable() {
             try {
-                const res = await fetch(`${API_BASE}/mqtt/mesin`);
+                const res = await fetch(`${API_BASE}/tags`);
                 const json = await res.json();
                 const data = json.data || [];
-                const tbody = document.getElementById("deviceTopicBody");
-
-                if (!data.length) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="tbl-empty">Belum ada mesin</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = data.map(m => {
-                    const isCustom = !!m.topic_custom;
-                    const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-
-                    const topicBadge = isCustom
-                        ? `<span class="topic-pill topic-custom">${m.topic_custom}</span>`
-                        : `<span class="topic-pill topic-global">—</span>`;
-                    const efektifBadge = `
-                    <div style="display:flex;align-items:center;gap:6px">
-                    <span class="topic-pill ${isCustom ? "topic-custom" : "topic-global"}">
-                        ${m.topic_efektif}
-                    </span>
-                    <button class="btn-copy" onclick="copyText('${m.topic_efektif}', this)">${copyIcon}</button>
-                    </div>
-                    `; const statusBadge = m.aktif
-                        ? `<span style="font-size:11px;color:var(--ok);font-weight:500">● Aktif</span>`
-                        : `<span style="font-size:11px;color:var(--txt4)">○ Nonaktif</span>`;
-                    const displayName = m.nama_display || m.nama_mesin.replace(/_/g, " ");
-
-                    return `<tr>
-                    <td>
-                    <div style="font-weight:500;font-size:12px">${displayName}</div>
-                    <div style="font-family:monospace;font-size:10px;color:var(--txt4)">${m.nama_mesin}</div>
-                    </td>
-                    <td>${statusBadge}</td>
-                    <td>${topicBadge}</td>
-                    <td>${efektifBadge}</td>
-                    <td>
-                    <button class="btn-sm accent" onclick='openEditTopic(${JSON.stringify(m)})'>Edit</button>
-                    ${isCustom ? `<button class="btn-sm" style="margin-left:4px" onclick="resetTopic('${m.nama_mesin}')">Reset ke Global</button>` : ""}
-                    </td>
-                </tr>`;
-                }).join("");
+                const tbody = document.getElementById("tagTableBody");
+                if (!data.length) { tbody.innerHTML = `<tr><td colspan="7" class="tbl-empty">Belum ada tag</td></tr>`; return; }
+                tbody.innerHTML = data.map(t => `
+      <tr>
+        <td style="font-weight:500;font-size:11px">${t.device_id}</td>
+        <td><span style="font-family:monospace;font-size:11px;color:var(--txt2)">${t.tag_name}</span></td>
+        <td class="txt-muted">${t.satuan || "—"}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-family:monospace;font-size:10px;color:var(--accent)">${t.mqtt_topic}</span>
+            <button class="btn-copy" onclick="copyText('${t.mqtt_topic}',this)">${copyIcon}</button>
+          </div>
+        </td>
+        <td class="txt-warn">${t.batas_warning ?? '—'}</td>
+        <td class="txt-crit">${t.batas_critical ?? '—'}</td>
+        <td><span style="font-size:11px;color:${t.aktif ? 'var(--ok)' : 'var(--txt4)'}">${t.aktif ? '● Aktif' : '○ Off'}</span></td>
+      </tr>`).join("");
             } catch {
-                document.getElementById("deviceTopicBody").innerHTML =
-                    `<tr><td colspan="5" class="tbl-empty">Gagal memuat data</td></tr>`;
+                document.getElementById("tagTableBody").innerHTML = `<tr><td colspan="7" class="tbl-empty">Gagal memuat</td></tr>`;
             }
         }
 
-        // ── EDIT TOPIC MODAL ───────────────────────────────────────
-        function openEditTopic(m) {
-            document.getElementById("editNamaMesin").value = m.nama_mesin;
-            document.getElementById("editNamaDisplay").textContent = m.nama_display || m.nama_mesin.replace(/_/g, " ");
-            document.getElementById("editNamaId").textContent = m.nama_mesin;
-            document.getElementById("editTopic").value = m.topic_custom || "";
-            document.getElementById("editTopicHint").textContent =
-                `Topic global saat ini: ${globalTopic}`;
-            openModal("modalTopic");
-        }
-
-        async function saveTopic() {
-            const nama = document.getElementById("editNamaMesin").value;
-            const topic = document.getElementById("editTopic").value.trim();
+        async function loadUnknownMessages() {
             try {
-                const res = await fetch(`${API_BASE}/mqtt/mesin/${encodeURIComponent(nama)}/topic`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mqtt_topic: topic || null })
-                });
+                const res = await fetch(`${API_BASE}/unknown-messages?limit=20`);
                 const json = await res.json();
-                if (!res.ok) return showToast(json.detail || "Gagal menyimpan", "err");
-                showToast(topic ? `Topic diset ke: ${topic}` : "Topic direset ke global ✓");
-                closeModal("modalTopic");
-                loadAll();
-            } catch { showToast("Gagal terhubung ke server", "err"); }
+                const data = json.data || [];
+                document.getElementById("unknownCount").textContent = `${data.length} pesan`;
+                const tbody = document.getElementById("unknownBody");
+                if (!data.length) { tbody.innerHTML = `<tr><td colspan="3" class="tbl-empty" style="padding:20px!important">Tidak ada unknown messages ✓</td></tr>`; return; }
+                tbody.innerHTML = data.map(m => `
+      <tr>
+        <td style="font-family:monospace;font-size:10px;color:var(--crit)">${m.mqtt_topic}</td>
+        <td class="txt-muted" style="font-size:11px">${m.alasan}</td>
+        <td class="txt-muted" style="font-size:10px">${fmtDT(m.ts_terima)}</td>
+      </tr>`).join("");
+            } catch { }
         }
 
-        async function resetTopic(nama) {
-            try {
-                const res = await fetch(`${API_BASE}/mqtt/mesin/${encodeURIComponent(nama)}/topic`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mqtt_topic: null })
-                });
-                if (!res.ok) return showToast("Gagal reset topic", "err");
-                showToast("Topic direset ke global ✓");
-                loadAll();
-            } catch { showToast("Gagal terhubung ke server", "err"); }
-        }
-
-        // ── FORCE SYNC ─────────────────────────────────────────────
         async function forceSync() {
             try {
                 const res = await fetch(`${API_BASE}/mqtt/sync`, { method: "POST" });
                 const json = await res.json();
                 if (!res.ok) return showToast("Gagal sync", "err");
-                const added = json.after.filter(t => !json.before.includes(t));
-                const removed = json.before.filter(t => !json.after.includes(t));
-                let msg = "Sync selesai";
-                if (added.length) msg += ` | +${added.length} topic`;
-                if (removed.length) msg += ` | -${removed.length} topic`;
+                const msg = `Sync selesai${json.added.length ? ` | +${json.added.length}` : ""}${json.removed.length ? ` | -${json.removed.length}` : ""}`;
                 showToast(msg);
                 loadAll();
             } catch { showToast("Gagal terhubung ke server", "err"); }
         }
 
-        function copyText(text, btn) {
-            navigator.clipboard.writeText(text).then(() => {
-                if (!btn) return showToast("Tersalin ✓");
-
-                btn.classList.add("copied");
-                const original = btn.innerHTML;
-
-                btn.innerHTML = "✓";
-                setTimeout(() => {
-                    btn.classList.remove("copied");
-                    btn.innerHTML = original;
-                }, 1200);
-            });
-        }
-
-        // ── LOAD ALL ───────────────────────────────────────────────
         async function loadAll() {
-            await Promise.all([loadBrokerInfo(), loadDeviceTopics()]);
+            await Promise.all([loadMqttInfo(), loadTagTable(), loadUnknownMessages()]);
         }
 
         loadAll();

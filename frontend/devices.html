@@ -1,12 +1,11 @@
-<!-- frontend\devices.html -->
-
+<!-- frontend/devices.html — v2.0 -->
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kelola Perangkat — Efortech</title>
+    <title>Kelola Perangkat — Efortech v2</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="sidebar.css" />
     <style>
@@ -27,11 +26,6 @@
 
         .btn-primary:hover {
             opacity: .88
-        }
-
-        .btn-primary svg {
-            width: 13px;
-            height: 13px
         }
 
         .btn-sm {
@@ -56,6 +50,19 @@
 
         .btn-sm.danger:hover {
             background: var(--crit-bg)
+        }
+
+        .btn-sm.accent {
+            color: var(--accent);
+            border-color: #bfdbfe
+        }
+
+        .btn-sm.accent:hover {
+            background: #eff6ff
+        }
+
+        [data-theme="dark"] .btn-sm.accent:hover {
+            background: #1e3a5f
         }
 
         .btn-ghost {
@@ -86,59 +93,103 @@
             opacity: .88
         }
 
-        .copy-wrap {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px
-        }
-
-        .btn-copy {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px;
-            height: 22px;
+        /* Device card layout */
+        .device-card {
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 4px;
-            background: transparent;
-            color: var(--txt4);
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: all var(--transition)
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            overflow: hidden
         }
 
-        .btn-copy:hover {
-            background: var(--surface2);
-            color: var(--txt2);
-            border-color: var(--border2)
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2)
         }
 
-        .btn-copy.copied {
-            color: var(--ok);
-            border-color: var(--ok-border);
-            background: var(--ok-bg)
+        .device-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px
         }
 
-        .btn-copy svg {
-            width: 11px;
-            height: 11px;
-            pointer-events: none
+        .device-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--txt1)
         }
 
-        .machine-id {
-            font-family: ui-monospace, "Cascadia Code", monospace;
+        .device-meta {
             font-size: 11px;
-            color: var(--txt3)
+            color: var(--txt4);
+            display: flex;
+            gap: 12px
         }
 
-        .machine-name {
-            font-weight: 500;
+        .device-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        /* Tags table inside device card */
+        .tag-table-wrap {
+            padding: 0
+        }
+
+        .tag-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 12px
         }
 
-        .action-row {
-            display: flex;
-            gap: 6px
+        .tag-table th {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--txt4);
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            background: var(--surface)
+        }
+
+        .tag-table td {
+            padding: 8px 14px;
+            color: var(--txt2);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tag-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .tag-table tr:hover td {
+            background: var(--surface2)
+        }
+
+        .add-tag-row {
+            padding: 8px 14px;
+            border-top: 1px solid var(--border)
+        }
+
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-family: monospace
+        }
+
+        .topic-mono {
+            font-family: ui-monospace, monospace;
+            font-size: 10px;
+            color: var(--accent)
         }
 
         .status-toggle {
@@ -161,34 +212,6 @@
             background: var(--surface2);
             color: var(--txt4);
             border: 1px solid var(--border)
-        }
-
-        .topic-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            padding: 2px 7px;
-            border-radius: 20px;
-            font-family: ui-monospace, monospace
-        }
-
-        .topic-custom {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe
-        }
-
-        .topic-global {
-            background: var(--surface2);
-            color: var(--txt4);
-            border: 1px solid var(--border)
-        }
-
-        [data-theme="dark"] .topic-custom {
-            background: #1e3a5f;
-            color: #93c5fd;
-            border-color: #1d4ed8
         }
 
         .modal-backdrop {
@@ -214,7 +237,7 @@
             max-width: 95vw;
             max-height: 95vh;
             display: flex;
-            flex-direction: column;
+            flex-direction: column
         }
 
         .modal-head {
@@ -242,8 +265,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            line-height: 1
+            font-size: 16px
         }
 
         .modal-close:hover {
@@ -256,7 +278,7 @@
             flex-direction: column;
             gap: 13px;
             overflow-y: auto;
-            flex: 1;
+            flex: 1
         }
 
         .modal-foot {
@@ -315,6 +337,17 @@
             color: var(--accent)
         }
 
+        .section-divider {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--txt4);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px
+        }
+
         .toast-wrap {
             position: fixed;
             bottom: 20px;
@@ -367,21 +400,11 @@
             color: var(--crit)
         }
 
-        .tbl-empty {
+        .empty-devices {
             text-align: center;
             color: var(--txt4);
-            padding: 40px !important
-        }
-
-        .section-divider {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--txt4);
-            text-transform: uppercase;
-            letter-spacing: .5px;
-            padding-bottom: 4px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 4px
+            padding: 40px;
+            font-size: 13px
         }
     </style>
 </head>
@@ -401,8 +424,8 @@
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
-                <span class="nav-brand">Monitoring Arus Mesin</span>
-                <span class="nav-sub">Efortech Industrial</span>
+                <span class="nav-brand">Industrial IoT Monitor</span>
+                <span class="nav-sub">Efortech v2.0</span>
             </div>
             <div class="nav-right">
                 <span class="nav-clock" id="navClock">--:--:--</span>
@@ -419,6 +442,7 @@
                 </button>
             </div>
         </nav>
+
         <div class="body-area">
             <nav class="sidebar" id="appSidebar">
                 <span class="sidebar-label">Menu</span>
@@ -448,151 +472,412 @@
                     <span class="nav-text">Konfigurasi MQTT</span>
                 </a>
             </nav>
+
             <main class="page-content">
                 <div class="page-header">
                     <div>
                         <div class="page-title">Kelola Perangkat</div>
-                        <div class="page-sub">Manajemen daftar mesin yang terdaftar di sistem</div>
+                        <div class="page-sub">Manajemen device dan tag parameter monitoring</div>
                     </div>
-                    <button class="btn-primary" onclick="openAdd()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <button class="btn-primary" onclick="openAddDevice()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            style="width:13px;height:13px">
                             <line x1="12" y1="5" x2="12" y2="19" />
                             <line x1="5" y1="12" x2="19" y2="12" />
                         </svg>
-                        Tambah Mesin
+                        Tambah Device
                     </button>
                 </div>
-                <div class="card">
-                    <div class="card-head"><span class="card-title">Daftar Mesin</span><span class="card-hint"
-                            id="totalMesin">—</span></div>
-                    <div class="table-scroll">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Mesin</th>
-                                    <th>Tipe</th>
-                                    <th>Lokasi</th>
-                                    <th>Batas Max</th>
-                                    <th>Topic MQTT</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="mesinTableBody">
-                                <tr>
-                                    <td colspan="7" class="tbl-empty">Memuat…</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+
+                <div id="deviceList">
+                    <div class="empty-devices">Memuat…</div>
                 </div>
             </main>
         </div>
     </div>
-    <!-- MODAL FORM -->
-    <div class="modal-backdrop" id="modalForm">
+
+    <!-- MODAL DEVICE -->
+    <div class="modal-backdrop" id="modalDevice">
         <div class="modal">
-            <div class="modal-head"><span class="modal-title" id="modalFormTitle">Tambah Mesin</span><button
-                    class="modal-close" onclick="closeModal('modalForm')">×</button></div>
+            <div class="modal-head">
+                <span class="modal-title" id="modalDeviceTitle">Tambah Device</span>
+                <button class="modal-close" onclick="closeModal('modalDevice')">×</button>
+            </div>
             <div class="modal-body">
-                <input type="hidden" id="formMode" value="add" /><input type="hidden" id="formOriginalName" value="" />
+                <input type="hidden" id="dMode" value="add" />
+                <input type="hidden" id="dOrigId" value="" />
                 <div class="form-group">
-                    <label class="form-label">Nama Mesin (ID) <span style="color:var(--crit)">*</span></label>
-                    <input class="form-input" id="fNama" placeholder="contoh: Mesin_CNC_03"
-                        style="font-family:monospace" />
-                    <span class="form-hint">Unik, dipakai di payload MQTT. Tidak bisa diubah setelah disimpan.</span>
+                    <label class="form-label">Device ID <span style="color:var(--crit)">*</span></label>
+                    <input class="form-input" id="dId" placeholder="contoh: PM_001" style="font-family:monospace" />
+                    <span class="form-hint">Unik, dipakai dalam topic MQTT. Tidak bisa diubah setelah disimpan.</span>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Nama Tampilan</label>
-                    <input class="form-input" id="fDisplay" placeholder="contoh: Mesin CNC 03" />
-                    <span class="form-hint info">Ini yang tampil di dashboard. Bisa diubah kapan saja.</span>
+                    <input class="form-input" id="dDisplay" placeholder="contoh: Power Meter 001" />
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Tipe Mesin</label><input class="form-input"
-                            id="fTipe" placeholder="contoh: CNC Milling" /></div>
+                    <div class="form-group"><label class="form-label">Tipe</label><input class="form-input" id="dTipe"
+                            placeholder="Power Meter" /></div>
                     <div class="form-group"><label class="form-label">Lokasi</label><input class="form-input"
-                            id="fLokasi" placeholder="contoh: Lantai 1 - Zona A" /></div>
+                            id="dLokasi" placeholder="Lantai 1 - Zona A" /></div>
                 </div>
-                <div class="section-divider" style="margin-top:4px">Batas Arus</div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Batas Max (A) <span
-                                style="color:var(--crit)">*</span></label><input class="form-input" id="fBatasMax"
-                            type="number" step="0.1" min="0" placeholder="20.0" /></div>
-                    <div class="form-group"><label class="form-label">Batas Warning (A) <span
-                                style="color:var(--crit)">*</span></label><input class="form-input" id="fBatasWarn"
-                            type="number" step="0.1" min="0" placeholder="15.0" /></div>
+                    <div class="form-group"><label class="form-label">Factory ID</label><input class="form-input"
+                            id="dFactory" value="efortech" /></div>
+                    <div class="form-group"><label class="form-label">Status</label>
+                        <select class="form-input" id="dAktif">
+                            <option value="true">Aktif</option>
+                            <option value="false">Nonaktif</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="section-divider" style="margin-top:4px">Konfigurasi MQTT</div>
-                <div class="form-group">
-                    <label class="form-label">Topic MQTT Custom</label>
-                    <input class="form-input" id="fTopic" placeholder="Kosongkan = pakai topic global"
-                        style="font-family:monospace;font-size:11px" />
-                    <span class="form-hint">Biarkan kosong untuk menggunakan topic global dari konfigurasi
-                        sistem.</span>
+                <div class="form-hint info" id="dTopicPreview"
+                    style="margin-top:4px;padding:6px 8px;background:var(--surface2);border-radius:4px;font-family:monospace;font-size:10px">
+                    Topic akan dibuat otomatis saat tag ditambahkan
                 </div>
-                <div class="form-group"><label class="form-label">Status Aktif</label><select class="form-input"
-                        id="fAktif">
-                        <option value="true">Aktif</option>
-                        <option value="false">Nonaktif</option>
-                    </select></div>
             </div>
-            <div class="modal-foot"><button class="btn-ghost" onclick="closeModal('modalForm')">Batal</button><button
-                    class="btn-primary" onclick="submitForm()"><span id="btnSubmitLabel">Simpan</span></button></div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeModal('modalDevice')">Batal</button>
+                <button class="btn-primary" onclick="submitDevice()"><span id="dBtnLabel">Simpan</span></button>
+            </div>
         </div>
     </div>
+
+    <!-- MODAL TAG -->
+    <div class="modal-backdrop" id="modalTag">
+        <div class="modal">
+            <div class="modal-head">
+                <span class="modal-title" id="modalTagTitle">Tambah Tag</span>
+                <button class="modal-close" onclick="closeModal('modalTag')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="tMode" value="add" />
+                <input type="hidden" id="tDeviceId" value="" />
+                <input type="hidden" id="tOrigName" value="" />
+                <div style="font-size:12px;color:var(--txt2);margin-bottom:2px">
+                    Device: <strong id="tDeviceDisplay">—</strong>
+                    <span style="font-family:monospace;font-size:10px;color:var(--txt4);margin-left:6px"
+                        id="tDeviceId2"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tag Name <span style="color:var(--crit)">*</span></label>
+                    <input class="form-input" id="tName" placeholder="contoh: current, voltage, pressure"
+                        style="font-family:monospace" />
+                    <span class="form-hint">Lowercase, dipakai sebagai segmen terakhir topic MQTT.</span>
+                </div>
+                <div class="form-hint info" id="tTopicPreview"
+                    style="padding:6px 8px;background:var(--surface2);border-radius:4px;font-family:monospace;font-size:10px">
+                    Topic: —
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Satuan</label><input class="form-input"
+                            id="tSatuan" placeholder="A, V, Hz, bar" /></div>
+                    <div class="form-group"><label class="form-label">Deskripsi</label><input class="form-input"
+                            id="tDesc" placeholder="Arus listrik fasa R" /></div>
+                </div>
+                <div class="section-divider">Threshold</div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Batas Warning</label><input class="form-input"
+                            id="tWarn" type="number" step="0.1" placeholder="—" /></div>
+                    <div class="form-group"><label class="form-label">Batas Critical</label><input class="form-input"
+                            id="tCrit" type="number" step="0.1" placeholder="—" /></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeModal('modalTag')">Batal</button>
+                <button class="btn-primary" onclick="submitTag()"><span id="tBtnLabel">Simpan</span></button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL CONFIRM DELETE -->
     <div class="modal-backdrop" id="modalConfirm">
         <div class="modal">
-            <div class="modal-head"><span class="modal-title">Konfirmasi Hapus</span><button class="modal-close"
-                    onclick="closeModal('modalConfirm')">×</button></div>
-            <div class="modal-body">
-                <p class="confirm-text">Yakin ingin menghapus mesin <span class="confirm-name"
-                        id="confirmName">—</span>?<br />Semua log terkait mesin ini <strong>tidak akan
-                        terhapus</strong>, namun mesin tidak bisa menerima data baru.</p>
+            <div class="modal-head">
+                <span class="modal-title">Konfirmasi Hapus</span>
+                <button class="modal-close" onclick="closeModal('modalConfirm')">×</button>
             </div>
-            <div class="modal-foot"><button class="btn-ghost" onclick="closeModal('modalConfirm')">Batal</button><button
-                    class="btn-danger" onclick="confirmDelete()">Hapus</button></div>
+            <div class="modal-body">
+                <p class="confirm-text" id="confirmText">—</p>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeModal('modalConfirm')">Batal</button>
+                <button class="btn-danger" onclick="confirmDelete()">Hapus</button>
+            </div>
         </div>
     </div>
+
     <div class="toast-wrap" id="toastWrap"></div>
+
     <script src="config.js"></script>
     <script>
         const API_BASE = window.APP_CONFIG?.API_BASE ?? "http://localhost:8000";
-        let deleteTarget = null;
+        let deleteAction = null;
+
+        // ── THEME & CLOCK ──────────────────────────────────────────
         let isDark = localStorage.getItem("theme") === "dark";
-        function applyTheme() { document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light"); document.getElementById("iconSun").style.display = isDark ? "none" : "block"; document.getElementById("iconMoon").style.display = isDark ? "block" : "none"; localStorage.setItem("theme", isDark ? "dark" : "light") }
-        function toggleTheme() { isDark = !isDark; applyTheme() }
+        function applyTheme() {
+            document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+            document.getElementById("iconSun").style.display = isDark ? "none" : "block";
+            document.getElementById("iconMoon").style.display = isDark ? "block" : "none";
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        }
+        function toggleTheme() { isDark = !isDark; applyTheme(); }
         applyTheme();
-        function updateClock() { const now = new Date(), p = n => String(n).padStart(2, "0"); document.getElementById("navClock").textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}` }
+        function updateClock() { const now = new Date(), p = n => String(n).padStart(2, "0"); document.getElementById("navClock").textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`; }
         setInterval(updateClock, 1000); updateClock();
-        function showToast(msg, type = "ok") { const t = document.createElement("div"); t.className = `toast ${type}`; t.textContent = msg; document.getElementById("toastWrap").appendChild(t); setTimeout(() => t.remove(), 3000) }
-        function openModal(id) { document.getElementById(id).classList.add("open") }
-        function closeModal(id) { document.getElementById(id).classList.remove("open") }
-        document.querySelectorAll(".modal-backdrop").forEach(el => el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open") }));
-        function copyText(text, btn) { navigator.clipboard.writeText(text).then(() => { btn.classList.add("copied"); const orig = btn.innerHTML; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'; setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = orig }, 1500) }) }
-        async function loadMesin() { try { const res = await fetch(`${API_BASE}/mesin`); const json = await res.json(); const data = json.data || []; document.getElementById("totalMesin").textContent = `${data.length} mesin terdaftar`; renderTable(data) } catch { document.getElementById("mesinTableBody").innerHTML = '<tr><td colspan="7" class="tbl-empty">Gagal memuat data</td></tr>' } }
-        function renderTable(data) {
-            const tbody = document.getElementById("mesinTableBody"); if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="tbl-empty">Belum ada mesin terdaftar</td></tr>'; return }
-            const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-            tbody.innerHTML = data.map(m => {
-                const displayName = m.nama_display || m.nama_mesin.replace(/_/g, " "); const topicBadge = m.mqtt_topic ? `<span class="topic-pill topic-custom" title="${m.mqtt_topic}">${m.mqtt_topic.length > 22 ? m.mqtt_topic.slice(0, 20) + "…" : m.mqtt_topic}</span>` : '<span class="topic-pill topic-global">global</span>';
-                return `<tr><td><div class="machine-name">${displayName}</div><div class="copy-wrap" style="margin-top:2px"><span class="machine-id">${m.nama_mesin}</span><button class="btn-copy" title="Salin nama_mesin" onclick="copyText('${m.nama_mesin}',this)">${copyIcon}</button></div></td><td class="txt-muted">${m.tipe_mesin || "—"}</td><td>${m.lokasi || "—"}</td><td class="txt-warn">${parseFloat(m.batas_arus_max).toFixed(1)} A</td><td>${topicBadge}</td><td><span class="status-toggle ${m.aktif ? "status-on" : "status-off"}">${m.aktif ? "● Aktif" : "○ Nonaktif"}</span></td><td><div class="action-row"><button class="btn-sm" onclick='openEdit(${JSON.stringify(m)})'>Edit</button><button class="btn-sm danger" onclick="openDelete('${m.nama_mesin}')">Hapus</button></div></td></tr>`
-            }).join("")
+
+        // ── HELPERS ────────────────────────────────────────────────
+        function showToast(msg, type = "ok") {
+            const t = document.createElement("div");
+            t.className = `toast ${type}`; t.textContent = msg;
+            document.getElementById("toastWrap").appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         }
-        function openAdd() { document.getElementById("formMode").value = "add"; document.getElementById("modalFormTitle").textContent = "Tambah Mesin"; document.getElementById("btnSubmitLabel").textContent = "Simpan";["fNama", "fDisplay", "fTipe", "fLokasi", "fTopic"].forEach(id => document.getElementById(id).value = ""); document.getElementById("fNama").disabled = false; document.getElementById("fBatasMax").value = "20.0"; document.getElementById("fBatasWarn").value = "15.0"; document.getElementById("fAktif").value = "true"; openModal("modalForm") }
-        function openEdit(m) { document.getElementById("formMode").value = "edit"; document.getElementById("formOriginalName").value = m.nama_mesin; document.getElementById("modalFormTitle").textContent = "Edit Mesin"; document.getElementById("btnSubmitLabel").textContent = "Update"; document.getElementById("fNama").value = m.nama_mesin; document.getElementById("fNama").disabled = true; document.getElementById("fDisplay").value = m.nama_display || ""; document.getElementById("fTipe").value = m.tipe_mesin || ""; document.getElementById("fLokasi").value = m.lokasi || ""; document.getElementById("fBatasMax").value = parseFloat(m.batas_arus_max).toFixed(1); document.getElementById("fBatasWarn").value = parseFloat(m.batas_arus_warning).toFixed(1); document.getElementById("fTopic").value = m.mqtt_topic || ""; document.getElementById("fAktif").value = m.aktif ? "true" : "false"; openModal("modalForm") }
-        async function submitForm() {
-            const mode = document.getElementById("formMode").value; const origName = document.getElementById("formOriginalName").value; const nama = document.getElementById("fNama").value.trim(); const batasMax = parseFloat(document.getElementById("fBatasMax").value); const batasWarn = parseFloat(document.getElementById("fBatasWarn").value);
-            if (!nama) return showToast("Nama mesin wajib diisi", "err"); if (isNaN(batasMax) || batasMax <= 0) return showToast("Batas Max harus angka positif", "err"); if (isNaN(batasWarn) || batasWarn <= 0) return showToast("Batas Warning harus angka positif", "err"); if (batasWarn >= batasMax) return showToast("Batas Warning harus lebih kecil dari Batas Max", "err");
-            const body = { nama_display: document.getElementById("fDisplay").value.trim() || null, tipe_mesin: document.getElementById("fTipe").value.trim() || null, lokasi: document.getElementById("fLokasi").value.trim() || null, batas_arus_max: batasMax, batas_arus_warning: batasWarn, mqtt_topic: document.getElementById("fTopic").value.trim() || null, aktif: document.getElementById("fAktif").value === "true" };
+        function openModal(id) { document.getElementById(id).classList.add("open"); }
+        function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+        document.querySelectorAll(".modal-backdrop").forEach(el =>
+            el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); })
+        );
+
+        // ── LOAD & RENDER ──────────────────────────────────────────
+        async function loadAll() {
             try {
-                let res; if (mode === "add") { res = await fetch(`${API_BASE}/mesin`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nama_mesin: nama, ...body }) }) } else { res = await fetch(`${API_BASE}/mesin/${encodeURIComponent(origName)}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }) }
-                const json = await res.json(); if (!res.ok) return showToast(json.detail || "Gagal menyimpan", "err"); showToast(mode === "add" ? "Mesin berhasil ditambahkan ✓" : "Mesin berhasil diupdate ✓"); closeModal("modalForm"); loadMesin()
-            } catch { showToast("Gagal terhubung ke server", "err") }
+                const [devRes, tagRes] = await Promise.all([
+                    fetch(`${API_BASE}/devices`),
+                    fetch(`${API_BASE}/tags`),
+                ]);
+                const devJson = await devRes.json();
+                const tagJson = await tagRes.json();
+                renderDevices(devJson.data || [], tagJson.data || []);
+            } catch {
+                document.getElementById("deviceList").innerHTML =
+                    '<div class="empty-devices">Gagal memuat data — pastikan backend berjalan</div>';
+            }
         }
-        function openDelete(nama) { deleteTarget = nama; document.getElementById("confirmName").textContent = nama.replace(/_/g, " "); openModal("modalConfirm") }
-        async function confirmDelete() { if (!deleteTarget) return; try { const res = await fetch(`${API_BASE}/mesin/${encodeURIComponent(deleteTarget)}`, { method: "DELETE" }); const json = await res.json(); if (!res.ok) return showToast(json.detail || "Gagal menghapus", "err"); showToast(`${deleteTarget.replace(/_/g, " ")} berhasil dihapus`); closeModal("modalConfirm"); deleteTarget = null; loadMesin() } catch { showToast("Gagal terhubung ke server", "err") } }
-        loadMesin();
+
+        function renderDevices(devices, allTags) {
+            const wrap = document.getElementById("deviceList");
+            if (!devices.length) {
+                wrap.innerHTML = '<div class="empty-devices">Belum ada device terdaftar — klik "Tambah Device"</div>';
+                return;
+            }
+
+            // Group tags per device
+            const tagMap = {};
+            for (const t of allTags) {
+                if (!tagMap[t.device_id]) tagMap[t.device_id] = [];
+                tagMap[t.device_id].push(t);
+            }
+
+            wrap.innerHTML = devices.map(d => {
+                const tags = tagMap[d.device_id] || [];
+                const tagRows = tags.map(t => `
+      <tr>
+        <td><span class="tag-pill" style="background:var(--surface2);color:var(--txt2);border:1px solid var(--border)">${t.tag_name}</span></td>
+        <td class="txt-muted">${t.satuan || "—"}</td>
+        <td class="topic-mono">${t.mqtt_topic}</td>
+        <td class="txt-warn">${t.batas_warning ?? "—"}</td>
+        <td class="txt-crit">${t.batas_critical ?? "—"}</td>
+        <td><span class="status-toggle ${t.aktif ? "status-on" : "status-off"}">${t.aktif ? "● Aktif" : "○ Off"}</span></td>
+        <td>
+          <div style="display:flex;gap:5px">
+            <button class="btn-sm accent" onclick='openEditTag(${JSON.stringify(d)}, ${JSON.stringify(t)})'>Edit</button>
+            <button class="btn-sm danger" onclick="openDeleteTag('${d.device_id}','${t.tag_name}')">Hapus</button>
+          </div>
+        </td>
+      </tr>`).join("") ||
+                    `<tr><td colspan="7" style="text-align:center;color:var(--txt4);padding:12px;font-size:11px">Belum ada tag — klik "+ Tag"</td></tr>`;
+
+                return `
+    <div class="device-card">
+      <div class="device-header">
+        <div class="device-header-left">
+          <div class="device-name">${d.nama_display || d.device_id}</div>
+          <div class="device-meta">
+            <span style="font-family:monospace">${d.device_id}</span>
+            ${d.tipe ? `<span>· ${d.tipe}</span>` : ""}
+            ${d.lokasi ? `<span>· ${d.lokasi}</span>` : ""}
+            <span>· factory: ${d.factory_id}</span>
+          </div>
+        </div>
+        <div class="device-actions">
+          <span class="status-toggle ${d.aktif ? "status-on" : "status-off"}">${d.aktif ? "● Aktif" : "○ Nonaktif"}</span>
+          <button class="btn-sm accent" onclick='openAddTag(${JSON.stringify(d)})'>+ Tag</button>
+          <button class="btn-sm" onclick='openEditDevice(${JSON.stringify(d)})'>Edit</button>
+          <button class="btn-sm danger" onclick="openDeleteDevice('${d.device_id}')">Hapus</button>
+        </div>
+      </div>
+      <div class="tag-table-wrap">
+        <table class="tag-table">
+          <thead>
+            <tr><th>Tag</th><th>Satuan</th><th>MQTT Topic</th><th>Warning</th><th>Critical</th><th>Status</th><th>Aksi</th></tr>
+          </thead>
+          <tbody>${tagRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+            }).join("");
+        }
+
+        // ── DEVICE MODAL ───────────────────────────────────────────
+        function openAddDevice() {
+            document.getElementById("dMode").value = "add";
+            document.getElementById("modalDeviceTitle").textContent = "Tambah Device";
+            document.getElementById("dBtnLabel").textContent = "Simpan";
+            ["dId", "dDisplay", "dTipe", "dLokasi"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("dFactory").value = "efortech";
+            document.getElementById("dAktif").value = "true";
+            document.getElementById("dId").disabled = false;
+            document.getElementById("dTopicPreview").textContent = "Topic: pabrik/{factory_id}/{device_id}/{tag_name}";
+            openModal("modalDevice");
+        }
+
+        function openEditDevice(d) {
+            document.getElementById("dMode").value = "edit";
+            document.getElementById("dOrigId").value = d.device_id;
+            document.getElementById("modalDeviceTitle").textContent = "Edit Device";
+            document.getElementById("dBtnLabel").textContent = "Update";
+            document.getElementById("dId").value = d.device_id;
+            document.getElementById("dId").disabled = true;
+            document.getElementById("dDisplay").value = d.nama_display || "";
+            document.getElementById("dTipe").value = d.tipe || "";
+            document.getElementById("dLokasi").value = d.lokasi || "";
+            document.getElementById("dFactory").value = d.factory_id || "efortech";
+            document.getElementById("dAktif").value = d.aktif ? "true" : "false";
+            openModal("modalDevice");
+        }
+
+        async function submitDevice() {
+            const mode = document.getElementById("dMode").value;
+            const origId = document.getElementById("dOrigId").value;
+            const deviceId = document.getElementById("dId").value.trim();
+            if (!deviceId) return showToast("Device ID wajib diisi", "err");
+
+            const body = {
+                device_id: deviceId,
+                nama_display: document.getElementById("dDisplay").value.trim() || null,
+                tipe: document.getElementById("dTipe").value.trim() || null,
+                lokasi: document.getElementById("dLokasi").value.trim() || null,
+                factory_id: document.getElementById("dFactory").value.trim() || "efortech",
+                aktif: document.getElementById("dAktif").value === "true",
+            };
+
+            try {
+                const res = mode === "add"
+                    ? await fetch(`${API_BASE}/devices`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+                    : await fetch(`${API_BASE}/devices/${encodeURIComponent(origId)}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal menyimpan", "err");
+                showToast(mode === "add" ? "Device berhasil ditambahkan ✓" : "Device berhasil diupdate ✓");
+                closeModal("modalDevice");
+                loadAll();
+            } catch { showToast("Gagal terhubung ke server", "err"); }
+        }
+
+        // ── TAG MODAL ──────────────────────────────────────────────
+        function openAddTag(device) {
+            document.getElementById("tMode").value = "add";
+            document.getElementById("tDeviceId").value = device.device_id;
+            document.getElementById("tDeviceDisplay").textContent = device.nama_display || device.device_id;
+            document.getElementById("tDeviceId2").textContent = device.device_id;
+            document.getElementById("modalTagTitle").textContent = "Tambah Tag";
+            document.getElementById("tBtnLabel").textContent = "Simpan";
+            ["tName", "tSatuan", "tDesc", "tWarn", "tCrit"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("tName").disabled = false;
+            document.getElementById("tTopicPreview").textContent =
+                `Topic: pabrik/${device.factory_id}/${device.device_id}/{tag_name}`;
+            document.getElementById("tName").addEventListener("input", () => {
+                const v = document.getElementById("tName").value;
+                document.getElementById("tTopicPreview").textContent =
+                    `Topic: pabrik/${device.factory_id}/${device.device_id}/${v || "{tag_name}"}`;
+            }, { once: false });
+            openModal("modalTag");
+        }
+
+        function openEditTag(device, tag) {
+            document.getElementById("tMode").value = "edit";
+            document.getElementById("tOrigName").value = tag.tag_name;
+            document.getElementById("tDeviceId").value = device.device_id;
+            document.getElementById("tDeviceDisplay").textContent = device.nama_display || device.device_id;
+            document.getElementById("tDeviceId2").textContent = device.device_id;
+            document.getElementById("modalTagTitle").textContent = "Edit Tag";
+            document.getElementById("tBtnLabel").textContent = "Update";
+            document.getElementById("tName").value = tag.tag_name;
+            document.getElementById("tName").disabled = true;
+            document.getElementById("tSatuan").value = tag.satuan || "";
+            document.getElementById("tDesc").value = tag.deskripsi || "";
+            document.getElementById("tWarn").value = tag.batas_warning ?? "";
+            document.getElementById("tCrit").value = tag.batas_critical ?? "";
+            document.getElementById("tTopicPreview").textContent = `Topic: ${tag.mqtt_topic}`;
+            openModal("modalTag");
+        }
+
+        async function submitTag() {
+            const mode = document.getElementById("tMode").value;
+            const deviceId = document.getElementById("tDeviceId").value;
+            const tagName = document.getElementById("tName").value.trim().toLowerCase();
+            if (!tagName) return showToast("Tag name wajib diisi", "err");
+
+            const warn = document.getElementById("tWarn").value;
+            const crit = document.getElementById("tCrit").value;
+            const body = {
+                tag_name: tagName,
+                satuan: document.getElementById("tSatuan").value.trim() || null,
+                deskripsi: document.getElementById("tDesc").value.trim() || null,
+                batas_warning: warn ? parseFloat(warn) : null,
+                batas_critical: crit ? parseFloat(crit) : null,
+            };
+
+            try {
+                const url = mode === "add"
+                    ? `${API_BASE}/devices/${encodeURIComponent(deviceId)}/tags`
+                    : `${API_BASE}/devices/${encodeURIComponent(deviceId)}/tags/${encodeURIComponent(document.getElementById("tOrigName").value)}`;
+                const res = await fetch(url, { method: mode === "add" ? "POST" : "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal menyimpan", "err");
+                if (mode === "add" && json.mqtt_topic) showToast(`Tag ditambahkan → topic: ${json.mqtt_topic} ✓`);
+                else showToast(mode === "add" ? "Tag berhasil ditambahkan ✓" : "Tag berhasil diupdate ✓");
+                closeModal("modalTag");
+                loadAll();
+            } catch { showToast("Gagal terhubung ke server", "err"); }
+        }
+
+        // ── DELETE ─────────────────────────────────────────────────
+        function openDeleteDevice(deviceId) {
+            deleteAction = async () => {
+                const res = await fetch(`${API_BASE}/devices/${encodeURIComponent(deviceId)}`, { method: "DELETE" });
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal hapus", "err");
+                showToast(`Device ${deviceId} dihapus ✓`);
+                loadAll();
+            };
+            document.getElementById("confirmText").innerHTML =
+                `Yakin hapus device <span class="confirm-name">${deviceId}</span>?<br>Semua tag dan log terkait juga akan terhapus.`;
+            openModal("modalConfirm");
+        }
+
+        function openDeleteTag(deviceId, tagName) {
+            deleteAction = async () => {
+                const res = await fetch(`${API_BASE}/devices/${encodeURIComponent(deviceId)}/tags/${encodeURIComponent(tagName)}`, { method: "DELETE" });
+                const json = await res.json();
+                if (!res.ok) return showToast(json.detail || "Gagal hapus", "err");
+                showToast(`Tag ${tagName} dihapus ✓`);
+                loadAll();
+            };
+            document.getElementById("confirmText").innerHTML =
+                `Yakin hapus tag <span class="confirm-name">${tagName}</span> dari device <span class="confirm-name">${deviceId}</span>?`;
+            openModal("modalConfirm");
+        }
+
+        async function confirmDelete() {
+            if (!deleteAction) return;
+            try { await deleteAction(); } catch { showToast("Gagal terhubung ke server", "err"); }
+            deleteAction = null;
+            closeModal("modalConfirm");
+        }
+
+        loadAll();
     </script>
     <script src="sidebar.js"></script>
 </body>

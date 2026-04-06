@@ -1,12 +1,11 @@
-<!-- frontend\index.html -->
-
+<!-- frontend/index.html — v2.0 -->
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monitoring Arus Mesin — Efortech</title>
+    <title>Monitoring IoT — Efortech</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="sidebar.css" />
 </head>
@@ -14,10 +13,9 @@
 <body>
     <div class="app-shell">
 
-        <!-- ── NAVBAR ──────────────────────────────────────────── -->
+        <!-- NAVBAR -->
         <nav class="navbar">
             <div class="nav-left">
-                <!-- Hamburger toggle -->
                 <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round">
@@ -26,12 +24,11 @@
                         <line class="hb-line" x1="2" y1="12" x2="14" y2="12" />
                     </svg>
                 </button>
-
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
-                <span class="nav-brand">Monitoring Arus Mesin</span>
-                <span class="nav-sub">Efortech Industrial</span>
+                <span class="nav-brand">Industrial IoT Monitor</span>
+                <span class="nav-sub">Efortech v2.0</span>
             </div>
             <div class="nav-right">
                 <div class="live-pill" id="livePill">
@@ -45,7 +42,7 @@
                         <path d="M3 3v5h5" />
                     </svg>
                 </button>
-                <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Toggle tema">
+                <button class="btn-icon" onclick="toggleTheme()" title="Toggle tema">
                     <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="4" />
                         <path
@@ -59,7 +56,7 @@
             </div>
         </nav>
 
-        <!-- ── ALERT BANNER ────────────────────────────────────── -->
+        <!-- ALERT BANNER -->
         <div class="alert-banner" id="alertBanner" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -69,13 +66,10 @@
             <span id="alertText">—</span>
         </div>
 
-        <!-- ── BODY AREA (sidebar + content) ───────────────────── -->
         <div class="body-area">
-
             <!-- SIDEBAR -->
             <nav class="sidebar" id="appSidebar">
                 <span class="sidebar-label">Menu</span>
-
                 <a href="index.html" class="active" data-tip="Dashboard">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7" />
@@ -85,7 +79,6 @@
                     </svg>
                     <span class="nav-text">Dashboard</span>
                 </a>
-
                 <a href="devices.html" data-tip="Kelola Perangkat">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="7" width="20" height="14" rx="2" />
@@ -102,21 +95,19 @@
                     </svg>
                     <span class="nav-text">Konfigurasi MQTT</span>
                 </a>
-
             </nav>
 
-            <!-- MAIN CONTENT -->
-            <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <!-- MAIN -->
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
 
-
-                <!-- ── KPI STRIP ────────────────────────────────────────── -->
+                <!-- KPI STRIP -->
                 <div class="kpi-strip">
                     <div class="kpi-card">
-                        <span class="kpi-label">Total log hari ini</span>
+                        <span class="kpi-label">Total log (24j)</span>
                         <span class="kpi-val" id="kTotal">—</span>
                     </div>
                     <div class="kpi-card">
-                        <span class="kpi-label">Mesin aktif</span>
+                        <span class="kpi-label">Device aktif</span>
                         <span class="kpi-val kpi-ok" id="kAktif">—</span>
                     </div>
                     <div class="kpi-card">
@@ -128,17 +119,17 @@
                         <span class="kpi-val kpi-crit" id="kCrit">—</span>
                     </div>
                     <div class="kpi-card">
-                        <span class="kpi-label">Rata-rata arus</span>
+                        <span class="kpi-label">Rata-rata semua tag</span>
                         <span class="kpi-val" id="kAvg">—</span>
                     </div>
                 </div>
 
                 <main class="main-layout">
-
                     <div class="col-left">
+                        <!-- GAUGES -->
                         <div class="card">
                             <div class="card-head">
-                                <span class="card-title">Pembacaan terkini</span>
+                                <span class="card-title">Pembacaan terkini — per tag</span>
                                 <span class="card-hint" id="lastUpdate">—</span>
                             </div>
                             <div class="gauge-grid" id="gaugeGrid">
@@ -146,15 +137,17 @@
                             </div>
                         </div>
 
+                        <!-- STATISTIK -->
                         <div class="card">
                             <div class="card-head">
-                                <span class="card-title">Statistik per mesin (24 jam)</span>
+                                <span class="card-title">Statistik per tag (24 jam)</span>
                             </div>
                             <div class="table-scroll">
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>Mesin</th>
+                                            <th>Device</th>
+                                            <th>Tag</th>
                                             <th>Rata-rata</th>
                                             <th>Puncak</th>
                                             <th>Warning</th>
@@ -163,7 +156,7 @@
                                     </thead>
                                     <tbody id="statBody">
                                         <tr>
-                                            <td colspan="5" class="empty-cell">Memuat…</td>
+                                            <td colspan="6" class="empty-cell">Memuat…</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -172,12 +165,13 @@
                     </div>
 
                     <div class="col-right">
+                        <!-- LOG TABLE -->
                         <div class="card card-full">
                             <div class="card-head">
                                 <span class="card-title">Log terbaru</span>
                                 <div class="filter-group">
                                     <select id="filterMesin" onchange="fetchLogs()">
-                                        <option value="">Semua mesin</option>
+                                        <option value="">Semua device</option>
                                     </select>
                                     <select id="filterStatus" onchange="fetchLogs()">
                                         <option value="">Semua status</option>
@@ -192,34 +186,32 @@
                                     <thead>
                                         <tr>
                                             <th>Waktu</th>
-                                            <th>Mesin</th>
-                                            <th>Arus</th>
+                                            <th>Device</th>
+                                            <th>Tag</th>
+                                            <th>Nilai</th>
                                             <th>Status</th>
                                             <th>Level</th>
                                         </tr>
                                     </thead>
                                     <tbody id="logBody">
                                         <tr>
-                                            <td colspan="5" class="empty-cell">Memuat log…</td>
+                                            <td colspan="6" class="empty-cell">Memuat log…</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-
                 </main>
 
                 <footer class="site-footer">
-                    <span>Efortech Industrial Monitoring v1.0</span>
+                    <span>Efortech Industrial IoT Monitor v2.0</span>
                     <span id="footerUpdate">—</span>
                     <span>API: <code id="footerApi">localhost:8000</code></span>
                 </footer>
-
-            </div><!-- end main content wrapper -->
-        </div><!-- end body-area -->
-
-    </div><!-- end app-shell -->
+            </div>
+        </div>
+    </div>
 
     <script src="config.js"></script>
     <script src="app.js"></script>
