@@ -1,0 +1,144 @@
+{
+  "_panduan": "============================================================",
+  "_file": "mqtt/sample_payload_v2.json",
+  "_versi": "v2.0 — Topic-based Architecture",
+  "_format_topic": "pabrik/{factory_id}/{device_id}/{tag_name}",
+  "_panduan2": "============================================================",
+
+  "_perubahan_dari_v1": {
+    "v1_topic_tunggal": "pabrik/efortech/mesin/arus  (satu topic untuk semua)",
+    "v2_topic_per_tag": "pabrik/{factory}/{device}/{tag}  (satu topic per parameter)",
+    "v1_payload_berat": "{nama_mesin, nilai_arus, batas_arus_max, lokasi, keterangan, ...}",
+    "v2_payload_minimal": "{value, timestamp?}  — backend yang tahu metadata dari DB",
+    "v1_routing": "Payload content → cari nama_mesin di DB",
+    "v2_routing": "Topic structure → langsung tau device_id + tag_name"
+  },
+
+  "_tutorial_mqttx": {
+    "langkah_1": "Buka MQTTX → New Connection → Host: localhost, Port: 1883",
+    "langkah_2": "Klik Connect",
+    "langkah_3": "New Publish → isi Topic sesuai contoh di bawah",
+    "langkah_4": "Payload Type: JSON (atau Plain Text untuk plain number)",
+    "langkah_5": "Salin payload dari contoh di bawah → klik Publish",
+    "langkah_6": "Cek terminal Python — log: 💾 Log tersimpan | device=... tag=... value=..."
+  },
+
+  "contoh_1_minimal": {
+    "_topic": "pabrik/efortech/PM_001/current",
+    "_payload": {
+      "value": 12.5
+    },
+    "_catatan": "Format paling minimal — timestamp akan diisi otomatis oleh backend"
+  },
+
+  "contoh_2_dengan_timestamp": {
+    "_topic": "pabrik/efortech/PM_001/voltage",
+    "_payload": {
+      "value": 220.3,
+      "timestamp": "2026-04-02T10:00:00Z"
+    },
+    "_catatan": "Format lengkap dari gateway — timestamp dari sensor disimpan di ts_sensor"
+  },
+
+  "contoh_3_plain_number": {
+    "_topic": "pabrik/efortech/CONV_A/current",
+    "_payload_raw": "8.7",
+    "_catatan": "Plain number string — didukung untuk gateway sederhana / Node-RED / ESP32 tanpa library JSON"
+  },
+
+  "contoh_4_warning_trigger": {
+    "_topic": "pabrik/efortech/PM_001/current",
+    "_payload": {
+      "value": 21.5
+    },
+    "_catatan": "Akan masuk WARNING (batas_warning PM_001/current = 20.0 A)"
+  },
+
+  "contoh_5_critical_trigger": {
+    "_topic": "pabrik/efortech/PM_001/current",
+    "_payload": {
+      "value": 28.0
+    },
+    "_catatan": "Akan masuk CRITICAL (batas_critical PM_001/current = 25.0 A)"
+  },
+
+  "contoh_6_multi_tag_scenario": {
+    "_catatan": "Publish berurutan untuk simulasi multi-tag dari satu device",
+    "_publish_1": {
+      "_topic": "pabrik/efortech/PM_001/current",
+      "_payload": { "value": 14.2 }
+    },
+    "_publish_2": {
+      "_topic": "pabrik/efortech/PM_001/voltage",
+      "_payload": { "value": 219.8 }
+    },
+    "_publish_3": {
+      "_topic": "pabrik/efortech/PM_001/frequency",
+      "_payload": { "value": 50.1 }
+    }
+  },
+
+  "contoh_7_kompresor_pressure": {
+    "_topic": "pabrik/efortech/COMP_01/pressure",
+    "_payload": {
+      "value": 6.2,
+      "timestamp": "2026-04-02T10:05:00Z"
+    },
+    "_catatan": "Tag pressure di Kompresor 01 — satuan bar"
+  },
+
+  "contoh_8_unknown_topic": {
+    "_topic": "pabrik/efortech/MESIN_X/current",
+    "_payload": { "value": 5.0 },
+    "_catatan": "Device MESIN_X belum ada di DB → dicatat ke tabel unknown_messages. Cek di GET /unknown-messages"
+  },
+
+  "contoh_9_alias_key": {
+    "_topic": "pabrik/efortech/CONV_B/current",
+    "_payload": {
+      "v": 9.3,
+      "ts": "2026-04-02T10:10:00Z"
+    },
+    "_catatan": "Backend juga mengenali key 'v' sebagai value dan 'ts' sebagai timestamp — fleksibel untuk berbagai gateway"
+  },
+
+  "_semua_topic_terdaftar": {
+    "_catatan": "Topic ini otomatis disubscribe saat backend start (dari tabel tags di DB)",
+    "topics": [
+      "pabrik/efortech/PM_001/current",
+      "pabrik/efortech/PM_001/voltage",
+      "pabrik/efortech/PM_001/frequency",
+      "pabrik/efortech/PM_002/current",
+      "pabrik/efortech/PM_002/voltage",
+      "pabrik/efortech/CONV_A/current",
+      "pabrik/efortech/CONV_A/speed",
+      "pabrik/efortech/CONV_B/current",
+      "pabrik/efortech/COMP_01/current",
+      "pabrik/efortech/COMP_01/pressure",
+      "pabrik/efortech/PUMP_H01/current",
+      "pabrik/efortech/PUMP_H01/pressure"
+    ]
+  },
+
+  "_field_payload": {
+    "value":     "[WAJIB] Nilai numerik dari sensor (juga bisa key: v, val)",
+    "timestamp": "[OPSIONAL] ISO 8601 timestamp dari sensor/gateway (juga bisa key: ts, time)",
+    "_catatan":  "Field lain di payload DIABAIKAN — backend tidak percaya payload sebagai source of truth untuk identitas device"
+  },
+
+  "_integrasi_gateway": {
+    "node_red": {
+      "node": "mqtt out",
+      "topic_format": "pabrik/efortech/{device_id}/{tag_name}",
+      "payload": "msg.payload harus berisi: {value: <number>}"
+    },
+    "esp32_arduino": {
+      "library": "PubSubClient",
+      "contoh_publish": "client.publish(\"pabrik/efortech/PM_001/current\", \"12.5\");",
+      "catatan": "Plain number string langsung didukung"
+    },
+    "edgelink_siemens": {
+      "catatan": "Set MQTT topic sesuai format, payload JSON minimal {value: X}"
+    }
+  }
+}
