@@ -22,6 +22,12 @@ def list_devices(aktif_only: bool = False):
     data = device_repo.list_devices(aktif_only=aktif_only)
     return {"total": len(data), "data": data}
 
+@router.get("/status", summary="Status terkini semua device aktif")
+def get_device_status():
+    from repositories import log_repo
+    data = log_repo.get_device_status()
+    return {"total": len(data), "data": data}
+
 
 @router.get("/{device_id}", summary="Detail satu device")
 def get_device(device_id: str):

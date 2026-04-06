@@ -28,16 +28,6 @@ def get_logs(
     return {"total": len(data), "data": data}
 
 
-@router.get("/devices/status", summary="Status terkini semua device aktif")
-def get_device_status():
-    """
-    Mengembalikan semua device aktif beserta status terkini setiap tag-nya.
-    Dipakai oleh dashboard frontend.
-    """
-    data = log_repo.get_device_status()
-    return {"total": len(data), "data": data}
-
-
 @router.get("/statistik", summary="Statistik 24 jam per device+tag")
 def get_statistik():
     data = log_repo.get_statistik_24h()
