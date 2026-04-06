@@ -3,16 +3,11 @@
 #  FUNGSI  : Build image Nginx untuk serve static frontend
 # ============================================================
 
-# Nginx alpine — sangat ringan (~23MB)
 FROM nginx:alpine
 
-# Hapus default Nginx page
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy semua file frontend
 COPY frontend/ /usr/share/nginx/html/
-
-# Copy konfigurasi Nginx custom
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

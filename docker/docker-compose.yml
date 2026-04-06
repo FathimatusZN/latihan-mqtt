@@ -1,11 +1,12 @@
 # ============================================================
 #  FILE    : docker/docker-compose.yml
-#  FUNGSI  : Orkestrasi semua service dalam satu perintah
-#  CARA    : sudo docker-compose up -d
+#  FUNGSI  : Orkestrasi service — Industrial IoT Monitor v2
+#  CARA    : sudo docker-compose up -d --build
 #  SERVICE :
-#    1. postgres   → Database PostgreSQL
-#    2. backend    → Python FastAPI + MQTT subscriber
-#    3. frontend   → Nginx serve static files
+#    1. mosquitto  → MQTT broker
+#    2. postgres   → Database PostgreSQL
+#    3. backend    → Python FastAPI + MQTT subscriber
+#    4. frontend   → Nginx serve static files
 # ============================================================
 
 version: "3.9"
@@ -32,7 +33,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── 1. POSTGRESQL DATABASE ──────────────────────────────
+  # ── 1. POSTGRESQL DATABASE ───────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: mqtt-postgres
@@ -40,14 +41,12 @@ services:
     environment:
       POSTGRES_DB:       monitoring_pabrik
       POSTGRES_USER:     postgres
-      POSTGRES_PASSWORD: password_docker   # GANTI di production!
+      POSTGRES_PASSWORD: password_docker    # GANTI di production!
     volumes:
-      # Mount script SQL agar otomatis dijalankan saat container pertama kali dibuat
       - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-      # Persistent volume agar data tidak hilang saat container restart
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"   # Host:5433 → Container:5432 (hindari konflik dengan postgres lokal)
+      - "5433:5432"   # Host:5433 → Container:5432
     networks:
       - mqtt-net
     healthcheck:
@@ -65,28 +64,27 @@ services:
     restart: unless-stopped
     depends_on:
       postgres:
-        condition: service_healthy   # Tunggu postgres siap sebelum backend start
+        condition: service_healthy
       mosquitto:
         condition: service_healthy
     environment:
-      # Override .env dengan environment variables Docker
-      DB_HOST:        postgres          # Nama service → otomatis resolve oleh Docker network
+      DB_HOST:        postgres
       DB_PORT:        "5432"
       DB_NAME:        monitoring_pabrik
       DB_USER:        postgres
       DB_PASSWORD:    password_docker
       MQTT_BROKER:    mosquitto
       MQTT_PORT:      "1883"
-      MQTT_TOPIC:     pabrik/efortech/mesin/arus
       MQTT_CLIENT_ID: efortech-docker-001
       API_HOST:       0.0.0.0
       API_PORT:       "8000"
+      # Tidak ada MQTT_TOPIC global di v2 — topics di-manage dari DB
     ports:
-      - "8000:8000"   # Expose API ke host
+      - "8000:8000"
     networks:
       - mqtt-net
     volumes:
-      - ../backend:/app   # Hot-reload saat development (opsional)
+      - ../backend:/app   # hot-reload saat development
 
   # ── 3. NGINX FRONTEND ────────────────────────────────────
   frontend:
